@@ -1,4 +1,4 @@
-package userInterface;
+package swingUI;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -14,6 +14,7 @@ public class LoginWin extends JFrame {
     public LoginWin(JFrame parentFrame) {
         super("欢迎");
         this.setLayout(null);
+        this.setIconImage(new ImageIcon(getClass().getResource("/icon/01.jpg")).getImage());
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         //-------------登录注册组件
@@ -97,9 +98,10 @@ public class LoginWin extends JFrame {
 
         //-------------登录主按钮---登录--->转到主界面
         loginPanel.mainButton.addActionListener(e -> {
+
             JOptionPane.showMessageDialog(LoginWin.this, "登录成功！");
-            LoginWin.this.setVisible(false);
-            LoginWin.this.setEnabled(false);
+//            LoginWin.this.setVisible(false);
+            LoginWin.this.dispose();
             parentFrame.setVisible(true);
         });
         //-------------登录次按钮---转到注册
@@ -113,10 +115,9 @@ public class LoginWin extends JFrame {
         //-------------注册主按钮---注册--->转到登录
         registerPanel.mainButton.addActionListener(e -> {
             JOptionPane.showMessageDialog(LoginWin.this, "注册成功！\n返回登录界面");
+            String account = registerPanel.jtAccount.getText();
             registerPanel.minorButton.doClick();
-            loginPanel.clear();
-            loginPanel.jtAccount.setText(registerPanel.jtAccount.getText());//填充注册账号
-            registerPanel.clear();
+            loginPanel.jtAccount.setText(account);//填充注册账号
         });
         //-------------注册次按钮---转到登录
         registerPanel.minorButton.addActionListener(e -> {
@@ -124,11 +125,12 @@ public class LoginWin extends JFrame {
             registerPanel.disableButton();
             ToLog.start();
             loginPanel.clear();
+            registerPanel.clear();
         });
 
         //-------------向窗口添加组件、设置窗口属性
         this.add(MainJP);
-        this.setSize(400, 300);
+        this.setSize(400, 270);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -188,14 +190,14 @@ class LoginPanel extends JPanel {
                 if(jtAccount.getText().equals("请输入用户名")){
                     jtAccount.setText("");
                 }
-                jlAccount.setForeground(Color.black);
+                jtAccount.setForeground(Color.black);
             }
 
             @Override
             public void focusLost(FocusEvent e) {
                 if(jtAccount.getText().equals("")){
                     jtAccount.setText("请输入用户名");
-                    jlAccount.setForeground(Color.red);
+                    jtAccount.setForeground(Color.gray);
                 }
             }
         });
@@ -205,14 +207,14 @@ class LoginPanel extends JPanel {
                 if (jtPassword.getText().equals("请输入密码")){
                     jtPassword.setText("");
                 }
-                jlPassword.setForeground(Color.black);
+                jtPassword.setForeground(Color.black);
             }
 
             @Override
             public void focusLost(FocusEvent e) {
                 if(jtPassword.getText().equals("")){
                     jtPassword.setText("请输入密码");
-                    jlPassword.setForeground(Color.red);
+                    jtPassword.setForeground(Color.gray);
                 }
             }
         });
@@ -224,8 +226,6 @@ class LoginPanel extends JPanel {
         minorButton.setFont(new Font("等线", Font.PLAIN, 14));
         mainButton.setPreferredSize(preSizeT);
         minorButton.setPreferredSize(preSizeL);
-
-
 
         welcome.setBorder(new EtchedBorder());
         //-----------------添加控件
@@ -242,8 +242,6 @@ class LoginPanel extends JPanel {
     void clear(){
         jtAccount.setText("");
         jtPassword.setText("");
-        jlAccount.setForeground(Color.black);
-        jlPassword.setForeground(Color.black);
     }
     //-----------------禁用按钮
     void disableButton(){
