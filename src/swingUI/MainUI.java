@@ -113,6 +113,10 @@ class MainWin extends JFrame {
                 this.dispose();
                 new LoginWin(this);
             });
+
+            topPanel.addButton.addActionListener(e -> {
+                new AddItemWin(this);
+            });
         }
         mainjp.add(topPanel, BorderLayout.NORTH);
 
@@ -386,7 +390,11 @@ class LeftPanel extends JPanel {
 
         /*--------------------fresh--------------------*/
         refresh = new JButton("刷新");//刷新
-//        this.repaint();
+        refresh.addActionListener(e -> {
+            this.repaint();
+            System.out.println("repaint");
+        });
+        this.add(refresh);
     }
 }
 
@@ -413,10 +421,7 @@ class TopPanel extends JPanel {
         {
             leftTopJP.setOpaque(false);
             addButton = new TopButton("添加");
-            addButton.addActionListener(e -> {
-
-            });
-            delButton = new TopButton("删除项");
+            delButton = new TopButton("删除选中");
             delButton.addActionListener(e -> {
 
             });
