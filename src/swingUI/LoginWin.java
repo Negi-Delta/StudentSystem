@@ -144,7 +144,7 @@ class LoginPanel extends JPanel {
     JButton mainButton;
     JButton minorButton;
     JTextField jtAccount;
-    JTextField jtPassword;
+    JPasswordField jtPassword;
     JLabel welcome;
     JLabel jlAccount;
     JLabel jlPassword;
@@ -170,7 +170,7 @@ class LoginPanel extends JPanel {
         jlAccount = new JLabel("用户名： ");
         jtAccount = new JTextField("请输入用户名");
         jlPassword = new JLabel("密码： ");
-        jtPassword = new JTextField("请输入密码");
+        jtPassword = new JPasswordField();
 
         //-----------------初始化提示语与输入框
         jlAccount.setFont(font);
@@ -180,7 +180,7 @@ class LoginPanel extends JPanel {
         jtAccount.setPreferredSize(preSizeT);
         jtPassword.setPreferredSize(preSizeT);
         jtAccount.setForeground(Color.gray);
-        jtPassword.setForeground(Color.gray);
+        /*jtPassword.setForeground(Color.gray);*/
         jtAccount.setFont(font2);
         jtPassword.setFont(font2);
         //-----------------输入框焦点监听
@@ -200,7 +200,7 @@ class LoginPanel extends JPanel {
                     jtAccount.setForeground(Color.gray);
                 }
             }
-        });
+        });/*
         jtPassword.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -217,7 +217,7 @@ class LoginPanel extends JPanel {
                     jtPassword.setForeground(Color.gray);
                 }
             }
-        });
+        });*/
 
         //-----------------主次按钮
         mainButton = new JButton();
