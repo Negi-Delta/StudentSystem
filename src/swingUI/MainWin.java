@@ -155,16 +155,16 @@ public class MainWin extends JFrame {
             //排序
             {
                 leftPanel.idUp.addActionListener(e->{
-
+                    centerPanel.setCenterBox(centerPanel.centerNodes, "idUp");
                 });
                 leftPanel.idDown.addActionListener(e->{
-
+                    centerPanel.setCenterBox(centerPanel.centerNodes, "idDown");
                 });
                 leftPanel.gradeUp.addActionListener(e->{
-
+                    centerPanel.setCenterBox(centerPanel.centerNodes, "gradeUp");
                 });
                 leftPanel.gradeDown.addActionListener(e->{
-
+                    centerPanel.setCenterBox(centerPanel.centerNodes, "gradeDown");
                 });
             }
 
@@ -287,7 +287,9 @@ class CenterPanel extends JPanel {
                 Collections.sort(centerNodes, new Comparator<CenterNode>() {
                     @Override
                     public int compare(CenterNode o1, CenterNode o2) {
-                        return o1.grade.compareTo(o2.grade);
+                        Integer i1 = Integer.parseInt(o1.grade);
+                        Integer i2 = Integer.parseInt(o2.grade);
+                        return i1.compareTo(i2);
                     }
                 });
                 break;
@@ -295,7 +297,9 @@ class CenterPanel extends JPanel {
                 Collections.sort(centerNodes, new Comparator<CenterNode>() {
                     @Override
                     public int compare(CenterNode o1, CenterNode o2) {
-                        return -(o1.grade.compareTo(o2.grade));
+                        Integer i1 = Integer.parseInt(o1.grade);
+                        Integer i2 = Integer.parseInt(o2.grade);
+                        return -i1.compareTo(i2);
                     }
                 });
                 break;
@@ -497,7 +501,7 @@ class LeftPanel extends JPanel {
 
     public String getSortStandard(){
         if(idUp.isSelected()) return "idUp";
-        if(idDown.isSelected()) return "idDon";
+        if(idDown.isSelected()) return "idDown";
         if(gradeUp.isSelected()) return "gradeUp";
         if(gradeDown.isSelected()) return "gradeDown";
         throw new RuntimeException("未选中排序");
