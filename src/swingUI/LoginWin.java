@@ -144,7 +144,11 @@ public class LoginWin extends JFrame {
                     Teacher loginteacher = TeacherDao.getTeacher(account);
                     if(loginteacher == null){
                         //不存在此ID
-                        JOptionPane.showMessageDialog(LoginWin.this, "不存在此ID", "", JOptionPane.ERROR_MESSAGE);
+                        int answer = JOptionPane.showConfirmDialog(LoginWin.this, "该教师尚未注册，是否转到注册界面？", "提示", JOptionPane.YES_NO_OPTION);
+                        if (answer == JOptionPane.YES_OPTION) {
+                            loginPanel.minorButton.doClick();
+                            registerPanel.jtAccount.setText(account);
+                        }
                     } else {
                         String password = loginPanel.jtPassword.getText();
                         if (loginteacher.getPassword().equals(password)) {
@@ -211,9 +215,10 @@ public class LoginWin extends JFrame {
                     Teacher loginteacher = TeacherDao.getTeacher(account);
                     if(loginteacher == null){
                         //不存在此ID
-                        String password = loginPanel.jtPassword.getText();
+                        String password = registerPanel.jtPassword.getText();
                         if ( password.length()<21 && password.length()>5 ) {
                             //密码长度正确
+                            TeacherDao.regist(account, password);
                             JOptionPane.showMessageDialog(LoginWin.this, "注册成功！\n返回登录界面");
                             registerPanel.minorButton.doClick();
                             loginPanel.jtAccount.setText(account);
@@ -224,7 +229,12 @@ public class LoginWin extends JFrame {
                             registerPanel.jlPassword.setForeground(Color.red);
                         }
                     } else {
-                        JOptionPane.showMessageDialog(LoginWin.this, "不存在此ID", "", JOptionPane.ERROR_MESSAGE);
+                        //存在该ID
+                        int answer = JOptionPane.showConfirmDialog(LoginWin.this, "该教师已注册，是否转到登录界面？", "提示", JOptionPane.YES_NO_OPTION);
+                        if (answer == JOptionPane.YES_OPTION) {
+                            registerPanel.minorButton.doClick();
+                            loginPanel.jtAccount.setText(account);
+                        }
                     }
                 } else {
                     JOptionPane.showMessageDialog(LoginWin.this, "ID格式有误", "错误", JOptionPane.ERROR_MESSAGE);

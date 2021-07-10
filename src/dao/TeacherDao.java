@@ -150,4 +150,24 @@ public class TeacherDao {
         }
         delTeacher(teachers);
     }
+
+    public static void regist(String account, String password) {
+        PreparedStatement sta = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement("INSERT INTO teacher VALUES (?, ?)"
+            );
+            sta.setString(1, account);
+            sta.setString(2, password);
+            sta.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (sta != null) sta.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+    }
 }
