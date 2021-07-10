@@ -59,7 +59,6 @@ public class CourseDao {
             if (res.next()) {
                 courseName = res.getString("courseName");
             }
-            System.out.println("courseName = "+courseName);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

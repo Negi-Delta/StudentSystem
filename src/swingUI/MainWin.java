@@ -4,20 +4,16 @@ import dao.ClassDao;
 import dao.CourseDao;
 import dao.GradeDao;
 import dao.StudentDao;
-import model.Grade;
-import model.Student;
-import model.Teacher;
-import model.Users;
+import model.*;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author Delta
@@ -65,7 +61,7 @@ public class MainWin extends JFrame {
                     topPanel.arrowLabel.setText("►");
                 topPanel.rightTopJP.repaint();
                 if (topPanel.rightTopJP.getBounds().x == MainWin.this.getBounds().width - 37 - 160) stopShow.doClick();
-                System.out.println("in");
+//                System.out.println("in");
             });
             stopShow.addActionListener(new ActionListener() {
                 @Override
@@ -80,7 +76,7 @@ public class MainWin extends JFrame {
                     topPanel.arrowLabel.setText("◄");
                 topPanel.rightTopJP.repaint();
                 if (topPanel.rightTopJP.getBounds().x == MainWin.this.getBounds().width - 37) stopHide.doClick();
-                System.out.println("out");
+//                System.out.println("out");
             });
             stopHide.addActionListener(new ActionListener() {
                 @Override
@@ -103,8 +99,6 @@ public class MainWin extends JFrame {
                     if (mouseXInMainWin > MainWin.this.getBounds().width - 10 || mouseXInMainWin < 10 || mouseYInMainWin < 35 || mouseYInMainWin > 62) {
                         timerShow.stop();
                         timerHide.start();
-                        System.out.println(mouseXInMainWin);
-                        System.out.println(mouseYInMainWin);
                     }
                 }
 
@@ -132,6 +126,49 @@ public class MainWin extends JFrame {
 
         //--------------------LeftPanel--------------------//
         leftPanel = new LeftPanel();
+        //事件和初始化
+        {
+            //添加筛选班级和课程
+            {
+                ArrayList<SClass> classList = ClassDao.getClassList();
+                for (SClass sClass : classList) {
+                    leftPanel.classJComboBox.addItem(sClass.getClassName());
+                }
+                ArrayList<Course> courseList = CourseDao.getCourseList();
+                for (Course course : courseList) {
+                    leftPanel.courseJComboBox.addItem(course.getCourseName());
+                }
+                //筛选监听器
+                leftPanel.classJComboBox.addActionListener(e -> {
+                    String classFilter = (String) leftPanel.classJComboBox.getSelectedItem();
+                    ArrayList<CenterNode> centerNodes = centerPanel.getAllCenterNodes();
+                    if(!classFilter.equals("NULL"))centerNodes.removeIf(centerNode -> !centerNode.sClass.equals(classFilter));
+                    centerPanel.setCenterBox(centerNodes, leftPanel.getSortStandard());
+                });
+                leftPanel.courseJComboBox.addActionListener(e -> {
+                    String courseFilter = (String) leftPanel.courseJComboBox.getSelectedItem();
+                    ArrayList<CenterNode> centerNodes = centerPanel.getAllCenterNodes();
+                    if(!courseFilter.equals("NULL"))centerNodes.removeIf(centerNode -> !centerNode.course.equals(courseFilter));
+                    centerPanel.setCenterBox(centerNodes, leftPanel.getSortStandard());
+                });
+            }
+            //排序
+            {
+                leftPanel.idUp.addActionListener(e->{
+
+                });
+                leftPanel.idDown.addActionListener(e->{
+
+                });
+                leftPanel.gradeUp.addActionListener(e->{
+
+                });
+                leftPanel.gradeDown.addActionListener(e->{
+
+                });
+            }
+
+        }
         mainjp.add(leftPanel, BorderLayout.WEST);
 
         //--------------------CenterPanel--------------------//
@@ -160,7 +197,7 @@ public class MainWin extends JFrame {
 
             }
         });
-        if (MainWin.currentUser instanceof Student){
+        if (MainWin.currentUser instanceof Student) {
             studentMod();
         } else {
             teacherMod();
@@ -168,14 +205,18 @@ public class MainWin extends JFrame {
         this.add(mainjp);
     }
 
-    private void studentMod(){
+    private void studentMod() {
         topPanel.leftTopJP.setVisible(false);
         leftPanel.setVisible(false);
     }
 
-    private void teacherMod(){
+    private void teacherMod() {
         topPanel.leftTopJP.setVisible(true);
         leftPanel.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        new MainWin(null);
     }
 }
 
@@ -183,7 +224,7 @@ public class MainWin extends JFrame {
 class CenterPanel extends JPanel {
     JScrollPane centerJSP;
     JPanel centerBox = new JPanel();
-    ArrayList<CenterNode> gradeList;
+    ArrayList<CenterNode> centerNodes;
 
     public CenterPanel() {
         this.setLayout(new BorderLayout());
@@ -192,64 +233,84 @@ class CenterPanel extends JPanel {
         centerJSP.setBorder(new EtchedBorder());
 //        centerBox.setOpaque(false);
 //        centerBox.setBorder(new LineBorder(Color.red));
-        gradeList = new ArrayList<>();
+
+        setCenterBox(getAllCenterNodes(), "idUp");
+        this.add(centerJSP);
+    }
+
+    public ArrayList<CenterNode> getAllCenterNodes(){
+        centerNodes = new ArrayList<>();
+        ArrayList<Student> students;
         if (MainWin.currentUser instanceof Student) {
-            //学生登录
-            Student student = (Student) MainWin.currentUser;
+            students = new ArrayList<>();
+            students.add((Student) MainWin.currentUser);
+        } else {
+            students = StudentDao.getStudentList();
+        }
+        for (Student student : students) {
             ArrayList<Grade> studentGrades = GradeDao.getStudentGrade(student.getIdNumber());
-            if( studentGrades.size()>0 ){
-                //学生有选课信息
+            if (studentGrades.size() > 0) {
+                //有选课信息
                 for (Grade grade : studentGrades) {
-                    gradeList.add(new CenterNode(
+                    centerNodes.add(new CenterNode(
                             ClassDao.getClassName(student.getClassID()), student.getIdNumber(), student.getName(),
                             CourseDao.getCourseName(grade.getCourseID()), grade.getGrade()
                     ));
                 }
             } else {
-                //学生无选课信息
-                gradeList.add(new CenterNode(
+                //无选课信息
+                centerNodes.add(new CenterNode(
                         ClassDao.getClassName(student.getClassID()), student.getIdNumber(), student.getName(),
                         null, null
                 ));
             }
-        } else {
-            //教师登录
-            ArrayList<Student> students = StudentDao.getStudentList();
-            for (Student student : students) {
-                ArrayList<Grade> studentGrades = GradeDao.getStudentGrade(student.getIdNumber());
-                if( studentGrades.size()>0 ){
-                    //学生有选课信息
-                    for (Grade grade : studentGrades) {
-                        gradeList.add(new CenterNode(
-                                ClassDao.getClassName(student.getClassID()), student.getIdNumber(), student.getName(),
-                                CourseDao.getCourseName(grade.getCourseID()), grade.getGrade()
-                        ));
-                    }
-                } else {
-                    //学生无选课信息
-                    gradeList.add(new CenterNode(
-                            ClassDao.getClassName(student.getClassID()), student.getIdNumber(), student.getName(),
-                            null, null
-                    ));
-                }
-            }
         }
-        setCenterBox("id");
-        this.add(centerJSP);
+        return centerNodes;
     }
 
-    public void setCenterBox(String sortStandard) {
-        centerBox.setLayout(new GridLayout(Math.max(gradeList.size(), 20), 1));
-
+    public void setCenterBox(ArrayList<CenterNode> centerNodes, String sortStandard) {
+        centerBox = new JPanel(new GridLayout(Math.max(centerNodes.size(), 20), 1));
         //排序
-        Collections.sort(gradeList);
+        switch (sortStandard) {
+            case "idUp":
+                Collections.sort(centerNodes);
+                break;
+            case "idDown":
+                Collections.sort(centerNodes, new Comparator<CenterNode>() {
+                    @Override
+                    public int compare(CenterNode o1, CenterNode o2) {
+                        return -(o1.idNumber.compareTo(o2.idNumber));
+                    }
+                });
+                break;
+            case "gradeUp":
+                Collections.sort(centerNodes, new Comparator<CenterNode>() {
+                    @Override
+                    public int compare(CenterNode o1, CenterNode o2) {
+                        return o1.grade.compareTo(o2.grade);
+                    }
+                });
+                break;
+            case "gradeDown":
+                Collections.sort(centerNodes, new Comparator<CenterNode>() {
+                    @Override
+                    public int compare(CenterNode o1, CenterNode o2) {
+                        return -(o1.grade.compareTo(o2.grade));
+                    }
+                });
+                break;
+            default:
+                throw new RuntimeException("排序编号错误");
+        }
         //添加数据组件
-        Iterator<CenterNode> listIterator = gradeList.iterator();
+        Iterator<CenterNode> listIterator = centerNodes.iterator();
         while (listIterator.hasNext()) {
+            System.out.println("setCenterBox:");
             centerBox.add(listIterator.next());
         }
 
         centerJSP.setViewportView(centerBox);
+        centerJSP.repaint();
     }
 }
 
@@ -282,9 +343,11 @@ class CenterNode extends JPanel implements Comparable {
     private void initialize() {
         this.setLayout(new BorderLayout(0, 0));
         this.setPreferredSize(new Dimension(1300, 40));
-        nodeCheckBox = new JCheckBox();
-        nodeCheckBox.setBackground(new Color(236, 255, 255));
-        this.add(nodeCheckBox, BorderLayout.WEST);
+        if (MainWin.currentUser instanceof Teacher) {
+            nodeCheckBox = new JCheckBox();
+            nodeCheckBox.setBackground(new Color(236, 255, 255));
+            this.add(nodeCheckBox, BorderLayout.WEST);
+        }
         {
             /*--------------------nodeJLabelsJP--------------------*/
             JPanel nodeJLabelsJP = new JPanel();
@@ -368,16 +431,13 @@ class CenterNode extends JPanel implements Comparable {
 /*----------左侧烂--------------------左侧烂--------------------左侧烂--------------------左侧烂----------*/
 class LeftPanel extends JPanel {
     JTabbedPane filter;
-    JComboBox classJComboBox;
-    JComboBox courseJComboBox;
+    JComboBox<String> classJComboBox;
+    JComboBox<String> courseJComboBox;
     JTabbedPane sort;
     JRadioButton idUp;
     JRadioButton idDown;
-    ButtonGroup idButtonGroup;
     JRadioButton gradeUp;
     JRadioButton gradeDown;
-    ButtonGroup gradeButtonGroup;
-    JButton refresh;
 
     public LeftPanel() {
         this.setBackground(new Color(244, 255, 235));
@@ -390,18 +450,12 @@ class LeftPanel extends JPanel {
             //----------classJComboBox
             classJComboBox = new JComboBox<>();
             classJComboBox.addItem("NULL");
-            classJComboBox.addItem("ClassA");
-            classJComboBox.addItem("ClassB");
-            classJComboBox.addItem("ClassC");
             filter.addTab("班级", classJComboBox);
         }
         {
             //----------courseJComboBox
             courseJComboBox = new JComboBox<>();
             courseJComboBox.addItem("NULL");
-            courseJComboBox.addItem("CourseA");
-            courseJComboBox.addItem("CourseB");
-            courseJComboBox.addItem("CourseC");
             filter.addTab("课程", courseJComboBox);
         }
         filter.setPreferredSize(new Dimension(200, 80));
@@ -410,14 +464,14 @@ class LeftPanel extends JPanel {
 
         /*--------------------sort--------------------*/
         sort = new JTabbedPane();//排序
+        ButtonGroup sortButtonGroup = new ButtonGroup();
         {
             //----------|--idJRadioButtonDown
             idUp = new JRadioButton("按Id升序排列");
             idDown = new JRadioButton("按Id降序排列");
             //----------|--idButtonGroup
-            idButtonGroup = new ButtonGroup();
-            idButtonGroup.add(idUp);
-            idButtonGroup.add(idDown);
+            sortButtonGroup.add(idUp);
+            sortButtonGroup.add(idDown);
             JPanel idButtonPanel = new JPanel();
             idButtonPanel.add(idUp);
             idButtonPanel.add(idDown);
@@ -428,25 +482,25 @@ class LeftPanel extends JPanel {
             gradeUp = new JRadioButton("按成绩升序排列");
             gradeDown = new JRadioButton("按成绩降序排列");
             //----------|--CourseButtonGroup
-            gradeButtonGroup = new ButtonGroup();
-            gradeButtonGroup.add(gradeUp);
-            gradeButtonGroup.add(gradeDown);
+            sortButtonGroup.add(gradeUp);
+            sortButtonGroup.add(gradeDown);
             JPanel gradeButtonPanel = new JPanel();
             gradeButtonPanel.add(gradeUp);
             gradeButtonPanel.add(gradeDown);
             sort.addTab("Grade", gradeButtonPanel);
         }
+        idUp.setSelected(true);
         sort.setPreferredSize(new Dimension(200, 120));
         sort.setBorder(new TitledBorder("排序"));
         this.add(sort);
+    }
 
-        /*--------------------fresh--------------------*/
-        refresh = new JButton("刷新");//刷新
-        refresh.addActionListener(e -> {
-            this.repaint();
-            System.out.println("repaint");
-        });
-        this.add(refresh);
+    public String getSortStandard(){
+        if(idUp.isSelected()) return "idUp";
+        if(idDown.isSelected()) return "idDon";
+        if(gradeUp.isSelected()) return "gradeUp";
+        if(gradeDown.isSelected()) return "gradeDown";
+        throw new RuntimeException("未选中排序");
     }
 }
 
