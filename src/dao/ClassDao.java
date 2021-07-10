@@ -43,16 +43,43 @@ public class ClassDao {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-//            ConnectDao.closeConnection();
             return classList;
         }
     }
 
-    /**
-     *
-     * @param classList
-     * @return ArrayList<Integer> index
-     */
+    public static String getClassName(String classID){
+        String className=null;
+        PreparedStatement sta = null;
+        ResultSet res = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement("SELECT className FROM class WHERE classID=?");
+            sta.setString(1, classID);
+            res = sta.executeQuery();
+            if (res.next()) {
+                className = res.getString("className");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (res != null) {
+                    res.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (sta != null) {
+                    sta.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return className;
+        }
+    }
+
     public static ArrayList<Integer> containClass(ArrayList<SClass> classList){
         ArrayList<Integer> res = new ArrayList<>();
         int index = -1;
@@ -163,34 +190,34 @@ public class ClassDao {
 
         {
             //add
-            classList.add(new SClass("C20192002", "虚拟现实192班"));
-            classList.add(new SClass("C20192003", "虚拟现实193班"));
-            classList.add(new SClass("C20192004", "虚拟现实194班"));
+//            classList.add(new SClass("C20192002", "虚拟现实192班"));
+//            classList.add(new SClass("C20192003", "虚拟现实193班"));
+//            classList.add(new SClass("C20192004", "虚拟现实194班"));
             //对于参数集，若已存在课程则返回下标
 
-            if (ClassDao.containClass(classList).size()==0) {
-                ClassDao.addClass(classList);
-                System.out.println("add: "+classList);
-            } else {
-                System.out.println("exist");
-            }
-            classList.clear();
+//            if (ClassDao.containClass(classList).size()==0) {
+//                ClassDao.addClass(classList);
+//                System.out.println("add: "+classList);
+//            } else {
+//                System.out.println("exist");
+//            }
+//            classList.clear();
         }
         {
             //update
-            classList.add(new SClass("C20192002", "虚拟现实193班"));
-            ArrayList<Integer> containList = ClassDao.containClass(classList);
-            if(containList.size()==1) {
-                System.out.println("containList.size(): "+containList.size());
-                ClassDao.updateClass(classList);
-            } else {
-                System.out.println("not exist");
-            }
-            classList.clear();
+//            classList.add(new SClass("C20192002", "虚拟现实193班"));
+//            ArrayList<Integer> containList = ClassDao.containClass(classList);
+//            if(containList.size()==1) {
+//                System.out.println("containList.size(): "+containList.size());
+//                ClassDao.updateClass(classList);
+//            } else {
+//                System.out.println("not exist");
+//            }
+//            classList.clear();
         }
         {
             //delete
-            classList.add(new SClass("C20192004", "虚拟现实193班"));
+            classList.add(new SClass("C20192002", "虚拟现实193班"));
             ArrayList<Integer> containList = ClassDao.containClass(classList);
             if (containList.size()==0){
                 System.out.println("not exist");

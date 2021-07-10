@@ -1,5 +1,14 @@
 package swingUI;
 
+import dao.ClassDao;
+import dao.CourseDao;
+import dao.GradeDao;
+import dao.StudentDao;
+import model.Grade;
+import model.Student;
+import model.Teacher;
+import model.Users;
+
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
@@ -14,34 +23,34 @@ import java.util.Iterator;
  * @author Delta
  * Created in 2021-07-04 18:14
  */
-public class MainUI {
-    public MainUI(String winTitle) {
-        JFrame jFrame = new MainWin(winTitle);
-        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        jFrame.setSize(1585, 880);
-        jFrame.setMinimumSize(new Dimension(1585, 880));
-        jFrame.setMaximumSize(new Dimension(1920, 1080));
-        jFrame.setLocationRelativeTo(null);
-//        jFrame.setVisible(true);
-        new LoginWin(jFrame);
-    }
-}
-
 /*------------------------------------MainWindows------------------------------------*/
-class MainWin extends JFrame {
-    public MainWin(String title) {
-        super(title);
-        initialize();
+public class MainWin extends JFrame {
+    public static Users currentUser;
+
+    public MainWin(LoginWin parentLoginFrame) {
+        super("Student Performance Management System");//学生成绩管理系统
+        initialize(parentLoginFrame);
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.setSize(1585, 880);
+        this.setMinimumSize(new Dimension(1585, 880));
+        this.setMaximumSize(new Dimension(1920, 1080));
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
     }
 
-    private void initialize() {
+    JPanel mainjp;
+    TopPanel topPanel;
+    LeftPanel leftPanel;
+    CenterPanel centerPanel;
+
+    private void initialize(LoginWin parentLoginFrame) {
         this.setIconImage(new ImageIcon(getClass().getResource("/icon/01.jpg")).getImage());
 
-        JPanel mainjp = new JPanel();
+        mainjp = new JPanel();
         mainjp.setLayout(new BorderLayout());
 
         //--------------------TopPanel--------------------//
-        TopPanel topPanel = new TopPanel();
+        topPanel = new TopPanel();
         {
             /*
                 int mouseXInMainWin = MouseInfo.getPointerInfo().getLocation().x - MainWin.this.getBounds().x;
@@ -111,7 +120,7 @@ class MainWin extends JFrame {
 
             topPanel.logoutButton.addActionListener(e -> {
                 this.dispose();
-                new LoginWin(this);
+                parentLoginFrame.setVisible(true);
             });
 
             topPanel.addButton.addActionListener(e -> {
@@ -122,11 +131,11 @@ class MainWin extends JFrame {
 
 
         //--------------------LeftPanel--------------------//
-        LeftPanel leftPanel = new LeftPanel();
+        leftPanel = new LeftPanel();
         mainjp.add(leftPanel, BorderLayout.WEST);
 
         //--------------------CenterPanel--------------------//
-        CenterPanel centerPanel = new CenterPanel();
+        centerPanel = new CenterPanel();
         mainjp.add(centerPanel, BorderLayout.CENTER);
 
         this.addComponentListener(new ComponentListener() {
@@ -151,54 +160,95 @@ class MainWin extends JFrame {
 
             }
         });
+        if (MainWin.currentUser instanceof Student){
+            studentMod();
+        } else {
+            teacherMod();
+        }
         this.add(mainjp);
+    }
 
+    private void studentMod(){
+        topPanel.leftTopJP.setVisible(false);
+        leftPanel.setVisible(false);
+    }
+
+    private void teacherMod(){
+        topPanel.leftTopJP.setVisible(true);
+        leftPanel.setVisible(true);
     }
 }
 
 /*----------中央栏--------------------中央栏--------------------中央栏--------------------中央栏----------*/
 class CenterPanel extends JPanel {
     JScrollPane centerJSP;
-    JPanel centerBox;
+    JPanel centerBox = new JPanel();
+    ArrayList<CenterNode> gradeList;
 
     public CenterPanel() {
         this.setLayout(new BorderLayout());
         centerJSP = new JScrollPane();
 //        centerJSP.setPreferredSize(new Dimension(1340, 800));
         centerJSP.setBorder(new EtchedBorder());
-        centerBox = new JPanel();
 //        centerBox.setOpaque(false);
 //        centerBox.setBorder(new LineBorder(Color.red));
-
-        /*--------------------↓ SQL here ↓--------------------*//*--------------------↑ SQL here ↑--------------------*/
-//        ArrayList<StudentNode> StudentNodes = new ArrayList<>();
-        ArrayList<CenterNode> centerNodes = new ArrayList<>();
-        //预设数据库数据
-        for (int i = 1; i < 10; i++) {
-            centerNodes.add(new CenterNode("class", "S201900" + i, "name", "course", "100"));
+        gradeList = new ArrayList<>();
+        if (MainWin.currentUser instanceof Student) {
+            //学生登录
+            Student student = (Student) MainWin.currentUser;
+            ArrayList<Grade> studentGrades = GradeDao.getStudentGrade(student.getIdNumber());
+            if( studentGrades.size()>0 ){
+                //学生有选课信息
+                for (Grade grade : studentGrades) {
+                    gradeList.add(new CenterNode(
+                            ClassDao.getClassName(student.getClassID()), student.getIdNumber(), student.getName(),
+                            CourseDao.getCourseName(grade.getCourseID()), grade.getGrade()
+                    ));
+                }
+            } else {
+                //学生无选课信息
+                gradeList.add(new CenterNode(
+                        ClassDao.getClassName(student.getClassID()), student.getIdNumber(), student.getName(),
+                        null, null
+                ));
+            }
+        } else {
+            //教师登录
+            ArrayList<Student> students = StudentDao.getStudentList();
+            for (Student student : students) {
+                ArrayList<Grade> studentGrades = GradeDao.getStudentGrade(student.getIdNumber());
+                if( studentGrades.size()>0 ){
+                    //学生有选课信息
+                    for (Grade grade : studentGrades) {
+                        gradeList.add(new CenterNode(
+                                ClassDao.getClassName(student.getClassID()), student.getIdNumber(), student.getName(),
+                                CourseDao.getCourseName(grade.getCourseID()), grade.getGrade()
+                        ));
+                    }
+                } else {
+                    //学生无选课信息
+                    gradeList.add(new CenterNode(
+                            ClassDao.getClassName(student.getClassID()), student.getIdNumber(), student.getName(),
+                            null, null
+                    ));
+                }
+            }
         }
-        for (int i = 10; i < 12; i++) {
-            centerNodes.add(new CenterNode("class", "S20190" + i, "name", "course", "100"));
-        }
-
-        setCenterBox(centerNodes, "id");
-        /*--------------------↑ SQL here ↑--------------------*/
-
-//        centerJSP.add(centerBox);
+        setCenterBox("id");
         this.add(centerJSP);
     }
 
-    public void setCenterBox(ArrayList<CenterNode> studentlist, String sortStandard) {
-        centerBox.setLayout(new GridLayout(Math.max(studentlist.size(), 20), 1));
+    public void setCenterBox(String sortStandard) {
+        centerBox.setLayout(new GridLayout(Math.max(gradeList.size(), 20), 1));
 
-        //Test
         //排序
-        Collections.sort(studentlist);
+        Collections.sort(gradeList);
         //添加数据组件
-        Iterator<CenterNode> listIterator = studentlist.iterator();
+        Iterator<CenterNode> listIterator = gradeList.iterator();
         while (listIterator.hasNext()) {
             centerBox.add(listIterator.next());
         }
+
         centerJSP.setViewportView(centerBox);
     }
 }
@@ -252,16 +302,18 @@ class CenterNode extends JPanel implements Comparable {
             nodeJLabelsJP.add(gradeJL);
             this.add(nodeJLabelsJP, BorderLayout.CENTER);
         }
-        {
-            /*--------------------nodeButtonsJP--------------------*/
-            JPanel nodeButtonsJP = new JPanel();
-            nodeButtonsJP.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
-            nodeButtonsJP.setBackground(new Color(236, 255, 255));
-            editButton = new NodeButton("编辑", 90);
-            deleteButton = new NodeButton("删除", 90);
-            nodeButtonsJP.add(editButton);
-            nodeButtonsJP.add(deleteButton);
-            this.add(nodeButtonsJP, BorderLayout.EAST);
+        if (MainWin.currentUser instanceof Teacher) {
+            {
+                /*--------------------nodeButtonsJP--------------------*/
+                JPanel nodeButtonsJP = new JPanel();
+                nodeButtonsJP.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+                nodeButtonsJP.setBackground(new Color(236, 255, 255));
+                editButton = new NodeButton("编辑", 90);
+                deleteButton = new NodeButton("删除", 90);
+                nodeButtonsJP.add(editButton);
+                nodeButtonsJP.add(deleteButton);
+                this.add(nodeButtonsJP, BorderLayout.EAST);
+            }
         }
 
         this.setBorder(new LineBorder(new Color(0, 150, 150)));

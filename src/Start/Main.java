@@ -1,6 +1,6 @@
 package Start;
 
-import swingUI.MainUI;
+import swingUI.LoginWin;
 
 /**
  * @author Delta
@@ -8,6 +8,6 @@ import swingUI.MainUI;
  */
 public class Main {
     public static void main(String[] args) {
-        new MainUI("Student Grade Manage System");
+        new LoginWin();
     }
 }

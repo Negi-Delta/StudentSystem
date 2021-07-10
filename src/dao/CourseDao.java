@@ -47,6 +47,40 @@ public class CourseDao {
         }
     }
 
+    public static String getCourseName(String courseID){
+        String courseName=null;
+        PreparedStatement sta = null;
+        ResultSet res = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement("SELECT courseName FROM course WHERE courseID=?");
+            sta.setString(1, courseID);
+            res = sta.executeQuery();
+            if (res.next()) {
+                courseName = res.getString("courseName");
+            }
+            System.out.println("courseName = "+courseName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (res != null) {
+                    res.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (sta != null) {
+                    sta.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return courseName;
+        }
+    }
+
     public static ArrayList<Integer> containCourse(ArrayList<Course> courseList){
         ArrayList<Integer> res = new ArrayList<>();
         int index = -1;

@@ -12,6 +12,10 @@ public class Student extends Users{
         this.classID = classID;
     }
 
+    public Student(String idNumber, String password) {
+        super(idNumber, password, null);
+    }
+
     public String getClassID() {
         return classID;
     }
@@ -23,10 +27,10 @@ public class Student extends Users{
     @Override
     public String toString() {
         return "Student{" +
-                "classID='" + classID + '\'' +
-                ", idNumber='" + idNumber + '\'' +
+                "idNumber='" + idNumber + '\'' +
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
+                ", classID='" + classID + '\'' +
                 '}'+"\n";
     }
 }

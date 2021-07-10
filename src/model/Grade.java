@@ -9,9 +9,9 @@ import java.util.Objects;
 public class Grade {
     private String idNumber;
     private String courseID;
-    private int grade;
+    private String grade;
 
-    public Grade(String idNumber, String courseID, int grade) {
+    public Grade(String idNumber, String courseID, String grade) {
         this.idNumber = idNumber;
         this.courseID = courseID;
         this.grade = grade;
@@ -33,11 +33,11 @@ public class Grade {
         this.courseID = courseID;
     }
 
-    public int getGrade() {
+    public String getGrade() {
         return grade;
     }
 
-    public void setGrade(int grade) {
+    public void setGrade(String grade) {
         this.grade = grade;
     }
 

@@ -22,8 +22,7 @@ public class TeacherDao {
             while (res.next()) {
                 teacherList.add(new Teacher(
                         res.getString("idNumber"),
-                        res.getString("password"),
-                        ""
+                        res.getString("password")
                 ));
             }
         } catch (SQLException e) {
@@ -45,6 +44,43 @@ public class TeacherDao {
             }
 //            ConnectDao.closeConnection();
             return teacherList;
+        }
+    }
+
+    public static Teacher getTeacher(String idNumber){
+        Teacher teacher=null;
+        PreparedStatement sta = null;
+        ResultSet res = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement("SELECT * FROM teacher WHERE idNumber=?");
+            sta.setString(1, idNumber);
+            res = sta.executeQuery();
+            if (res.next()) {
+                teacher = new Teacher(
+                        res.getString("idNumber"),
+                        res.getString("password")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (res != null) {
+                    res.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (sta != null) {
+                    sta.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+//            ConnectDao.closeConnection();
+            return teacher;
         }
     }
 
@@ -106,10 +142,11 @@ public class TeacherDao {
 //            ConnectDao.closeConnection();
         }
     }
+
     public static void delTeacher(int... ids){
         ArrayList<Teacher> teachers = new ArrayList<>();
         for (int id : ids) {
-            teachers.add(new Teacher(String.valueOf(id), "", ""));
+            teachers.add(new Teacher(String.valueOf(id), ""));
         }
         delTeacher(teachers);
     }

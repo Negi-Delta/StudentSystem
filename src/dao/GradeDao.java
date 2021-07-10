@@ -23,7 +23,7 @@ public class GradeDao {
                 gradeList.add(new Grade(
                         res.getString("idNumber"),
                         res.getString("CourseID"),
-                        res.getInt("Grade")
+                        res.getString("Grade")
                 ));
             }
         } catch (SQLException e) {
@@ -43,7 +43,43 @@ public class GradeDao {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-//            ConnectDao.closeConnection();
+            return gradeList;
+        }
+    }
+
+    public static ArrayList<Grade> getStudentGrade(String idNumber) {
+        ArrayList<Grade> gradeList = new ArrayList<>();
+        PreparedStatement sta = null;
+        ResultSet res = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement("SELECT * FROM stucougra WHERE idNumber=?");
+            sta.setString(1, idNumber);
+            res = sta.executeQuery();
+            while (res.next()) {
+                gradeList.add(new Grade(
+                        res.getString("idNumber"),
+                        res.getString("CourseID"),
+                        res.getString("Grade")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (res != null) {
+                    res.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (sta != null) {
+                    sta.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             return gradeList;
         }
     }
@@ -70,7 +106,7 @@ public class GradeDao {
             for (Grade Grade : gradeList) {
                 sta.setString(1, Grade.getIdNumber());
                 sta.setString(2, Grade.getCourseID());
-                sta.setInt(3, Grade.getGrade());
+                sta.setString(3, Grade.getGrade());
                 sta.addBatch();
             }
             sta.executeBatch();
@@ -114,10 +150,10 @@ public class GradeDao {
         Connection con = ConnectDao.getConection();
         try {
             sta = con.prepareStatement("UPDATE stucougra set Grade=? where idNumber=? AND courseID=?");
-            for (Grade Grade : gradeList) {
-                sta.setInt(1, Grade.getGrade());
-                sta.setString(2, Grade.getIdNumber());
-                sta.setString(3, Grade.getCourseID());
+            for (Grade grade : gradeList) {
+                sta.setString(1, grade.getGrade());
+                sta.setString(2, grade.getIdNumber());
+                sta.setString(3, grade.getCourseID());
                 sta.addBatch();
             }
             sta.executeBatch();

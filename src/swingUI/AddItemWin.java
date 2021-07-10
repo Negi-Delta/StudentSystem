@@ -28,30 +28,27 @@ public class AddItemWin extends JDialog {
         CardLayout centerCard = new CardLayout();
         JPanel cardPanel = new JPanel(centerCard);
 
-            /*--------------------TextAreaPanel--------------------*//*--------------------JPanel--------------------*/
-            TextAreaPanel courseArea = new TextAreaPanel();
-            TextAreaPanel classArea = new TextAreaPanel();
-            TextAreaPanel studentArea = new TextAreaPanel();
-            TextAreaPanel electiveArea = new TextAreaPanel();
-            courseArea.hintText.setText("请按格式输入需要添加的课程信息\n\n" +
-                    "添加格式：\n    九位课程ID + 课程名称\n\n课程间以逗号隔开\n" +
-                    "如：\nD20192001高等数学，\nD20192002Java，\nD20192003C++, \nD20192004C#"
-            );
-            classArea.hintText.setText("请按格式输入需要添加的班级信息\n\n" +
-                    "添加格式：\n    九位班级ID + 班级名称\n\n班级间以逗号隔开\n" +
-                    "如：\nC20192001虚拟现实191，\nD20192002虚拟现实192，\nD20192003虚拟现实193, \nD20192004虚拟现实194"
-            );
-            studentArea.hintText.setText("请按格式输入需要添加的学生信息\n\n" +
-                    "添加格式：\n    九位学生ID + 姓名\n\n课程间以逗号隔开\n" +
-                    "如：\nS20192001刘一，\nS20192002陈二，\nS20192003张三, \nS20192004李四"
-            );
-            electiveArea.hintText.setText("请按格式输入需要添加的选课信息\n\n" +
-                    "添加格式：\n    学生ID + 多个课程ID\n\n课程间以逗号隔开\n" +
-                    "如：\nS20192001D20192001D20192002，" +
-                        "\nS20192002D20192003，" +
-                        "\nS20192003D20192001D20192003, " +
-                        "\nS20192004D20192002"
-            );
+        /*--------------------TextAreaPanel--------------------*//*--------------------JPanel--------------------*/
+        TextAreaPanel courseArea = new TextAreaPanel();
+        TextAreaPanel classArea = new TextAreaPanel();
+        TextAreaPanel studentArea = new TextAreaPanel();
+        TextAreaPanel electiveArea = new TextAreaPanel();
+        courseArea.hintText.setText("请在右侧输入需要添加的课程信息\n\n" +
+                "添加格式：\n    九位课程ID + 课程名称\n\n以逗号隔开\n" +
+                "如：\nD20192001高等数学，\nD20192002Java，\nD20192003C++, \nD20192004C#"
+        );
+        classArea.hintText.setText("请在右侧输入需要添加的班级信息\n\n" +
+                "添加格式：\n    九位班级ID + 班级名称\n\n以逗号隔开\n" +
+                "如：\nC20192001虚拟现实191，\nD20192002虚拟现实192，\nD20192003虚拟现实193, \nD20192004虚拟现实194"
+        );
+        studentArea.hintText.setText("请在右侧输入需要添加的学生信息\n\n" + "添加格式：\n    九位学生ID + 姓名\n\n以逗号隔开\n" + "如：\nS20192001刘一，\nS20192002陈二，\nS20192003张三, \nS20192004李四");
+        electiveArea.hintText.setText("请在右侧输入需要添加的选课信息\n\n" +
+                "添加格式：\n    学生ID + 多个课程ID\n\n以逗号隔开\n" +
+                "如：\nS20192001D20192001D20192002，" +
+                "\nS20192002D20192003，" +
+                "\nS20192003D20192001D20192003, " +
+                "\nS20192004D20192002"
+        );
 
         cardPanel.add(courseArea, "Course");
         cardPanel.add(classArea, "Class");
@@ -130,7 +127,7 @@ public class AddItemWin extends JDialog {
             clearAreaButton.setBorder(rightButtonBorder);
             {
                 /*--------------------RightButtonListener--------------------*//*--------------------Listener--------------------*/
-                clearAreaButton.addActionListener(e->{
+                clearAreaButton.addActionListener(e -> {
                     courseArea.addItemArea.setText("");
                     classArea.addItemArea.setText("");
                     studentArea.addItemArea.setText("");
@@ -149,12 +146,13 @@ public class AddItemWin extends JDialog {
     }
 
     /*--------------------resetBorder--------------------*//*--------------------Method--------------------*/
-    EmptyBorder emptyBorder = new EmptyBorder(0,0,0,0);
-    CompoundBorder tagBorder = new CompoundBorder(new TitledBorder(
+    EmptyBorder emptyBorder = new EmptyBorder(0, 0, 0, 0);
+    TitledBorder tagBorder = new TitledBorder(
             new EmptyBorder(0, 0, 0, 0), "▄▄▄▄▄▄",
             TitledBorder.CENTER, TitledBorder.BOTTOM,
-            new Font("Arial", Font.ITALIC, 10), Color.magenta), null);
-    private void resetBorder(AddWinTopButton tag, AddWinTopButton b1, AddWinTopButton b2, AddWinTopButton b3){
+            new Font("Arial", Font.ITALIC, 10), Color.magenta);
+
+    private void resetBorder(AddWinTopButton tag, AddWinTopButton b1, AddWinTopButton b2, AddWinTopButton b3) {
         tag.setBorder(tagBorder);
         b1.setBorder(emptyBorder);
         b2.setBorder(emptyBorder);
@@ -204,9 +202,9 @@ class TextAreaPanel extends JPanel {
 class AddWinTopButton extends JToggleButton {
     public AddWinTopButton(String text) {
         super(text);
-        this.setOpaque(false);
+//        this.setOpaque(false);
         this.setBackground(new Color(206, 255, 255));
-        this.setFont(new Font("等线",Font.BOLD, 16));
+        this.setFont(new Font("等线", Font.BOLD, 16));
 //            this.setForeground(Color.magenta);
         this.setPreferredSize(new Dimension(60, 30));
         this.setBorder(new EmptyBorder(0, 0, 0, 0));
