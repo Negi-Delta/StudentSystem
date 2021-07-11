@@ -2,20 +2,17 @@ package swingUI;
 
 import dao.ClassDao;
 import dao.CourseDao;
-import dao.GradeDao;
 import dao.StudentDao;
 import model.Course;
-import model.Grade;
 import model.SClass;
 import model.Student;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Delta

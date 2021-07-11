@@ -1,7 +1,5 @@
 package swingUI;
 
-import JFormDesigner.ADDWIN;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import dao.ClassDao;
 import dao.CourseDao;
 import dao.GradeDao;
@@ -9,13 +7,15 @@ import dao.StudentDao;
 import model.*;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 
 /**
  * @author Delta
@@ -132,7 +132,7 @@ public class MainWin extends JFrame {
 
             topPanel.addButton.addActionListener(e -> {
                 if (currentUser instanceof Teacher) new AddItemWin(this);
-                else new AddEletiveWin();
+                else new AddEletiveWin(this);
             });
         }
         mainjp.add(topPanel, BorderLayout.NORTH);
@@ -413,7 +413,7 @@ class CenterNode extends JPanel implements Comparable {
 
                     });
                     deleteButton.addActionListener(e -> {
-//                        GradeDao.updateGrade();
+
                     });
                 }
 
@@ -530,30 +530,30 @@ class LeftPanel extends JPanel {
 
     public void setFilter() {
         if (filter != null) this.remove(filter);
-            filter = new JTabbedPane();//筛选
-            //----------classJComboBox
-            classJComboBox = new JComboBox<>();
-            classJComboBox.addItem("NULL");
-            filter.addTab("班级", classJComboBox);
-            if (MainWin.currentUser instanceof Student) {
-                filter.setVisible(false);
-            }
-            ArrayList<SClass> classList = ClassDao.getClassList();
-            for (SClass sClass : classList) {
-                classJComboBox.addItem(sClass.getClassName());
-            }
-            //----------courseJComboBox
-            courseJComboBox = new JComboBox<>();
-            courseJComboBox.addItem("NULL");
-            filter.addTab("课程", courseJComboBox);
-            ArrayList<Course> courseList = CourseDao.getCourseList();
-            for (Course course : courseList) {
-                courseJComboBox.addItem(course.getCourseName());
-            }
+        filter = new JTabbedPane();//筛选
+        //----------classJComboBox
+        classJComboBox = new JComboBox<>();
+        classJComboBox.addItem("NULL");
+        filter.addTab("班级", classJComboBox);
+        if (MainWin.currentUser instanceof Student) {
+            filter.setVisible(false);
+        }
+        ArrayList<SClass> classList = ClassDao.getClassList();
+        for (SClass sClass : classList) {
+            classJComboBox.addItem(sClass.getClassName());
+        }
+        //----------courseJComboBox
+        courseJComboBox = new JComboBox<>();
+        courseJComboBox.addItem("NULL");
+        filter.addTab("课程", courseJComboBox);
+        ArrayList<Course> courseList = CourseDao.getCourseList();
+        for (Course course : courseList) {
+            courseJComboBox.addItem(course.getCourseName());
+        }
 
-            filter.setPreferredSize(new Dimension(200, 80));
-            filter.setBorder(new TitledBorder("筛选"));
-            this.add(filter);
+        filter.setPreferredSize(new Dimension(200, 80));
+        filter.setBorder(new TitledBorder("筛选"));
+        this.add(filter);
 //        filter.repaint();
     }
 
@@ -630,13 +630,13 @@ class TopPanel extends JPanel {
         }
         this.add(rightTopJP, BorderLayout.EAST);
     }
+}
 
-    class TopButton extends JButton {
-        public TopButton(String text) {
-            super(text);
-            this.setBackground(new Color(206, 255, 255));
-            this.setPreferredSize(new Dimension(73, 26));
-            this.setBorder(new EtchedBorder());
-        }
+class TopButton extends JButton {
+    public TopButton(String text) {
+        super(text);
+        this.setBackground(new Color(206, 255, 255));
+        this.setPreferredSize(new Dimension(73, 26));
+        this.setBorder(new EtchedBorder());
     }
 }

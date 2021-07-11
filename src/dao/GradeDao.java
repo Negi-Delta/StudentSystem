@@ -1,5 +1,6 @@
 package dao;
 
+import model.Course;
 import model.Grade;
 import model.Student;
 
@@ -88,9 +89,9 @@ public class GradeDao {
         ArrayList<Integer> res = new ArrayList<>();
         int index = -1;
         ArrayList<Grade> curGrade = GradeDao.getGradeList();
-        for (Grade Grade : gradeList) {
+        for (Grade grade : gradeList) {
             index++;
-            if (curGrade.contains(Grade)) {
+            if (curGrade.contains(grade)) {
                 res.add(index);
                 break;
             }
@@ -103,10 +104,10 @@ public class GradeDao {
         Connection con = ConnectDao.getConection();
         try {
             sta = con.prepareStatement("INSERT INTO stucougra VALUES (?, ?, ?)");
-            for (Grade Grade : gradeList) {
-                sta.setString(1, Grade.getIdNumber());
-                sta.setString(2, Grade.getCourseID());
-                sta.setString(3, Grade.getGrade());
+            for (Grade grade : gradeList) {
+                sta.setString(1, grade.getIdNumber());
+                sta.setString(2, grade.getCourseID());
+                sta.setString(3, grade.getGrade());
                 sta.addBatch();
             }
             sta.executeBatch();
@@ -122,14 +123,21 @@ public class GradeDao {
         }
     }
 
+    public static void addGrade(String idNumber, String course) {
+        ArrayList<Grade> gradeList = new ArrayList<>();
+        System.out.println(course);
+        gradeList.add(new Grade(idNumber, course, null));
+        addGrade(gradeList);
+    }
+
     public static void delEletive(ArrayList<Grade> gradeList){
         PreparedStatement sta = null;
         Connection con = ConnectDao.getConection();
         try {
             sta = con.prepareStatement("DELETE FROM stucougra WHERE idNumber=? AND CourseID=?");
-            for (Grade Grade : gradeList) {
-                sta.setString(1, Grade.getIdNumber());
-                sta.setString(2, Grade.getCourseID());
+            for (Grade grade : gradeList) {
+                sta.setString(1, grade.getIdNumber());
+                sta.setString(2, grade.getCourseID());
                 sta.addBatch();
             }
             sta.executeBatch();
