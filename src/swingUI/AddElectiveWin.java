@@ -13,8 +13,8 @@ import java.util.ArrayList;
  * @author Delta
  * Created in 2021-07-11 01:37
  */
-public class AddEletiveWin extends JDialog {
-    public AddEletiveWin(JFrame parent) {
+public class AddElectiveWin extends JDialog {
+    public AddElectiveWin(JFrame parent) {
         super(parent, "添加选课");
         initialize();
         this.setVisible(true);
@@ -23,14 +23,14 @@ public class AddEletiveWin extends JDialog {
     JComboBox<Course> courseJComboBox;
     TopButton addButton = new TopButton("添加");
     private void initialize() {
-        this.setLayout(new FlowLayout());
-        this.setBackground(new Color(245, 236, 255));
+        this.setLayout(new BorderLayout());
         this.setIconImage(new ImageIcon(getClass().getResource("/icon/01.jpg")).getImage());
         this.setSize(210, 75);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
+        JPanel jPanel = new JPanel();
+        jPanel.setBackground(new Color(255, 179, 254));
 
         //----------courseJComboBox
         {
@@ -47,10 +47,10 @@ public class AddEletiveWin extends JDialog {
                     courseJComboBox.addItem(course);
                 }
             } else {
-                courseJComboBox.addItem(null);
+                courseJComboBox.addItem(new Course("", "NULL"));
                 addButton.setEnabled(false);
             }
-            this.add(courseJComboBox);
+            jPanel.add(courseJComboBox);
         }
 
         //----------addButton
@@ -58,14 +58,16 @@ public class AddEletiveWin extends JDialog {
 //            addButton = new TopButton("添加");
             addButton.addActionListener(e->{
                 String addCourse = ((Course)courseJComboBox.getSelectedItem()).getCourseID();
-                System.out.println("["+MainWin.currentUser.getIdNumber()+","+addCourse+"]");
                 GradeDao.addGrade(MainWin.currentUser.getIdNumber(), addCourse);
             });
-            this.add(addButton);
+            jPanel.add(addButton);
         }
+
+        this.add(jPanel, BorderLayout.CENTER);
+
     }
 
     public static void main(String[] args) {
-        new AddEletiveWin(null);
+        new AddElectiveWin(null);
     }
 }

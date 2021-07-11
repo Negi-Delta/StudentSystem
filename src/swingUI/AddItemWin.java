@@ -141,7 +141,6 @@ public class AddItemWin extends JDialog {
                 });
                 addItemButton.addActionListener(e -> {
                     //--------------------SQL Here--------------------
-                    Switch:
                     switch (selectedTag) {
                         case 0:
                             //Course
@@ -152,7 +151,7 @@ public class AddItemWin extends JDialog {
                                     JOptionPane.showMessageDialog(AddItemWin.this, "存在格式错误：\n" + course, "",
                                                                   JOptionPane.ERROR_MESSAGE
                                     );
-                                    break Switch;
+                                    return;
                                 }
                             }
                             ArrayList<Course> courseList = new ArrayList<>();
@@ -169,7 +168,7 @@ public class AddItemWin extends JDialog {
                                                               "以下课程已存在：\n" + sb.toString().substring(0, 9), "",
                                                               JOptionPane.WARNING_MESSAGE
                                 );
-                                break Switch;
+                                return;
                             }
                             CourseDao.addCourse(courseList);
                             JOptionPane.showMessageDialog(AddItemWin.this, "添加成功！");
@@ -184,7 +183,7 @@ public class AddItemWin extends JDialog {
                                     JOptionPane.showMessageDialog(AddItemWin.this, "存在格式错误：\n" + sclass, "",
                                                                   JOptionPane.ERROR_MESSAGE
                                     );
-                                    break Switch;
+                                    return;
                                 }
                             }
                             ArrayList<SClass> classList = new ArrayList<>();
@@ -201,7 +200,7 @@ public class AddItemWin extends JDialog {
                                                               "以下班级已存在：\n" + sb.toString().substring(0, 9), "",
                                                               JOptionPane.WARNING_MESSAGE
                                 );
-                                break Switch;
+                                return;
                             }
                             ClassDao.addClass(classList);
                             JOptionPane.showMessageDialog(AddItemWin.this, "添加成功！");
@@ -216,7 +215,7 @@ public class AddItemWin extends JDialog {
                                     JOptionPane.showMessageDialog(AddItemWin.this, "存在格式错误：\n" + student, "",
                                                                   JOptionPane.ERROR_MESSAGE
                                     );
-                                    break Switch;
+                                    return;
                                 }
                             }
                             ArrayList<Student> studentList = new ArrayList<>();
@@ -233,7 +232,7 @@ public class AddItemWin extends JDialog {
                                                               "以下学生已存在：\n" + sb.toString().substring(0, 9), "",
                                                               JOptionPane.WARNING_MESSAGE
                                 );
-                                break Switch;
+                                return;
                             }
                             StudentDao.addStudents(studentList);
                             JOptionPane.showMessageDialog(AddItemWin.this, "添加成功！");

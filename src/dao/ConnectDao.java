@@ -1,8 +1,8 @@
 package dao;
 
-import com.sun.javafx.logging.PulseLogger;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * @author Delta
@@ -14,7 +14,7 @@ public class ConnectDao {
 
     private static Connection con = null;
 
-    public static java.sql.Connection getConection() {
+    public static Connection getConection() {
         if (con == null) {
             synchronized (ConnectDao.class) {
                 if (con == null) {

@@ -19,7 +19,7 @@ public class GradeDao {
         Connection con = ConnectDao.getConection();
         try {
             sta = con.createStatement();
-            res = sta.executeQuery("SELECT * FROM stucougra");
+            res = sta.executeQuery("SELECT * FROM grades");
             while (res.next()) {
                 gradeList.add(new Grade(
                         res.getString("idNumber"),
@@ -54,7 +54,7 @@ public class GradeDao {
         ResultSet res = null;
         Connection con = ConnectDao.getConection();
         try {
-            sta = con.prepareStatement("SELECT * FROM stucougra WHERE idNumber=?");
+            sta = con.prepareStatement("SELECT * FROM grades WHERE idNumber=?");
             sta.setString(1, idNumber);
             res = sta.executeQuery();
             while (res.next()) {
@@ -103,7 +103,7 @@ public class GradeDao {
         PreparedStatement sta = null;
         Connection con = ConnectDao.getConection();
         try {
-            sta = con.prepareStatement("INSERT INTO stucougra VALUES (?, ?, ?)");
+            sta = con.prepareStatement("INSERT INTO grades VALUES (?, ?, ?)");
             for (Grade grade : gradeList) {
                 sta.setString(1, grade.getIdNumber());
                 sta.setString(2, grade.getCourseID());
@@ -130,11 +130,11 @@ public class GradeDao {
         addGrade(gradeList);
     }
 
-    public static void delEletive(ArrayList<Grade> gradeList){
+    public static void delElective(ArrayList<Grade> gradeList){
         PreparedStatement sta = null;
         Connection con = ConnectDao.getConection();
         try {
-            sta = con.prepareStatement("DELETE FROM stucougra WHERE idNumber=? AND CourseID=?");
+            sta = con.prepareStatement("DELETE FROM grades WHERE idNumber=? AND CourseID=?");
             for (Grade grade : gradeList) {
                 sta.setString(1, grade.getIdNumber());
                 sta.setString(2, grade.getCourseID());
@@ -153,15 +153,51 @@ public class GradeDao {
         }
     }
 
-    public static void delGrade(){
-
-    }
-
-    public static void updateGrade(ArrayList<Grade> gradeList) {
+    public static void delElective(String idNumber, String courseID){
         PreparedStatement sta = null;
         Connection con = ConnectDao.getConection();
         try {
-            sta = con.prepareStatement("UPDATE stucougra set Grade=? where idNumber=? AND courseID=?");
+            sta = con.prepareStatement("DELETE FROM grades WHERE idNumber=? AND CourseID=?");
+            sta.setString(1, idNumber);
+            sta.setString(2, courseID);
+            sta.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (sta != null) sta.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+//            ConnectDao.closeConnection();
+        }
+    }
+
+    public static void delGrade(String idNumber, String courseID){
+        PreparedStatement sta = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement("UPDATE grades set Grade=null WHERE idNumber=? AND CourseID=?");
+            sta.setString(1, idNumber);
+            sta.setString(2, courseID);
+            sta.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (sta != null) sta.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+//            ConnectDao.closeConnection();
+        }
+    }
+
+    public static void updateGrades(ArrayList<Grade> gradeList) {
+        PreparedStatement sta = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement("UPDATE grades set Grade=? where idNumber=? AND courseID=?");
             for (Grade grade : gradeList) {
                 sta.setString(1, grade.getGrade());
                 sta.setString(2, grade.getIdNumber());
@@ -177,7 +213,28 @@ public class GradeDao {
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
-//            ConnectDao.closeConnection();
+        }
+    }
+
+    public static void updateGrade(String idNumber, String courseID, String grade) {
+        PreparedStatement sta = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement(
+                    "UPDATE grades set Grade=? where idnumber=? AND courseID=?"
+            );
+            sta.setString(1, grade);
+            sta.setString(2, idNumber);
+            sta.setString(3, courseID);
+            sta.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (sta != null) sta.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
     }
 

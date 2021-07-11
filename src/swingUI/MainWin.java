@@ -7,15 +7,13 @@ import dao.StudentDao;
 import model.*;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author Delta
@@ -23,6 +21,7 @@ import java.util.Iterator;
  */
 public class MainWin extends JFrame {
     public static Users currentUser;
+    public static HashSet<CenterNodeInfo> selectedNodes = new HashSet<>();
 
     public MainWin(LoginWin parentLoginFrame) {
         super("Student Performance Management System");//学生成绩管理系统
@@ -132,7 +131,34 @@ public class MainWin extends JFrame {
 
             topPanel.addButton.addActionListener(e -> {
                 if (currentUser instanceof Teacher) new AddItemWin(this);
-                else new AddEletiveWin(this);
+                else new AddElectiveWin(this);
+            });
+
+            //--------------------EditButtonListener----------------------------------------EditButtonListener
+            topPanel.editButton.addActionListener(e -> {
+                if (MainWin.selectedNodes.size() > 0) {
+                    new EditWin(this, MainWin.selectedNodes);
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                                                  "未选择项目!", "ERROR",
+                                                  JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            });
+            //--------------------DelButtonListener----------------------------------------DelButtonListener
+            topPanel.delButton.addActionListener(e -> {
+                if (MainWin.selectedNodes.size() > 0) {
+                    new DeleteWin(this, MainWin.selectedNodes);
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                                                  "未选择项目!", "ERROR",
+                                                  JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            });
+            //--------------------AboutButtonListener----------------------------------------AboutButtonListener
+            topPanel.aboutButton.addActionListener(e -> {
+                new AboutWin(this);
             });
         }
         mainjp.add(topPanel, BorderLayout.NORTH);
@@ -149,14 +175,14 @@ public class MainWin extends JFrame {
                     String classFilter = (String) leftPanel.classJComboBox.getSelectedItem();
                     ArrayList<CenterNode> centerNodes = centerPanel.getAllCenterNodes();
                     if (!classFilter.equals("NULL"))
-                        centerNodes.removeIf(centerNode -> !classFilter.equals(centerNode.sClass));
+                        centerNodes.removeIf(centerNode -> !classFilter.equals(centerNode.className));
                     centerPanel.setCenterBox(centerNodes, leftPanel.getSortStandard());
                 });
                 leftPanel.courseJComboBox.addActionListener(e -> {
                     String courseFilter = (String) leftPanel.courseJComboBox.getSelectedItem();
                     ArrayList<CenterNode> centerNodes = centerPanel.getAllCenterNodes();
                     if (!courseFilter.equals("NULL"))
-                        centerNodes.removeIf(centerNode -> !courseFilter.equals(centerNode.course));
+                        centerNodes.removeIf(centerNode -> !courseFilter.equals(centerNode.courseName));
                     centerPanel.setCenterBox(centerNodes, leftPanel.getSortStandard());
                 });
             }
@@ -190,14 +216,14 @@ public class MainWin extends JFrame {
                                 String classFilter = (String) leftPanel.classJComboBox.getSelectedItem();
                                 ArrayList<CenterNode> centerNodes2 = centerPanel.getAllCenterNodes();
                                 if (!classFilter.equals("NULL"))
-                                    centerNodes2.removeIf(centerNode -> !classFilter.equals(centerNode.sClass));
+                                    centerNodes2.removeIf(centerNode -> !classFilter.equals(centerNode.className));
                                 centerPanel.setCenterBox(centerNodes2, leftPanel.getSortStandard());
                             });
                             leftPanel.courseJComboBox.addActionListener(d -> {
                                 String courseFilter = (String) leftPanel.courseJComboBox.getSelectedItem();
                                 ArrayList<CenterNode> centerNodes2 = centerPanel.getAllCenterNodes();
                                 if (!courseFilter.equals("NULL"))
-                                    centerNodes2.removeIf(centerNode -> !courseFilter.equals(centerNode.course));
+                                    centerNodes2.removeIf(centerNode -> !courseFilter.equals(centerNode.courseName));
                                 centerPanel.setCenterBox(centerNodes2, leftPanel.getSortStandard());
                             });
                         }
@@ -276,14 +302,16 @@ class CenterPanel extends JPanel {
                 //有选课信息
                 for (Grade grade : studentGrades) {
                     centerNodes.add(new CenterNode(
-                            ClassDao.getClassName(student.getClassID()), student.getIdNumber(), student.getName(),
+                            student.getClassID(), ClassDao.getClassName(student.getClassID()), student.getIdNumber(),
+                            student.getName(), grade.getCourseID(),
                             CourseDao.getCourseName(grade.getCourseID()), grade.getGrade()
                     ));
                 }
             } else {
                 //无选课信息
                 centerNodes.add(new CenterNode(
-                        ClassDao.getClassName(student.getClassID()), student.getIdNumber(), student.getName(),
+                        student.getClassID(), ClassDao.getClassName(student.getClassID()), student.getIdNumber(),
+                        student.getName(), null,
                         null, null
                 ));
             }
@@ -350,17 +378,22 @@ class CenterPanel extends JPanel {
 
 //--------------------CenterNode--------------------
 class CenterNode extends JPanel implements Comparable {
-    String sClass;
+    String classID;
+    String className;
     String idNumber;
     String name;
-    String course;
+    String courseID;
+    String courseName;
     String grade;
 
-    public CenterNode(String sClass, String idNumber, String name, String course, String grade) {
-        this.sClass = sClass;
+    public CenterNode(String classID, String className, String idNumber, String name, String courseID,
+                      String courseName, String grade) {
+        this.classID = classID;
+        this.className = className;
         this.idNumber = idNumber;
         this.name = name;
-        this.course = course;
+        this.courseID = courseID;
+        this.courseName = courseName;
         this.grade = grade;
         initialize();
     }
@@ -380,6 +413,14 @@ class CenterNode extends JPanel implements Comparable {
         if (MainWin.currentUser instanceof Teacher) {
             nodeCheckBox = new JCheckBox();
             nodeCheckBox.setBackground(new Color(236, 255, 255));
+            nodeCheckBox.addActionListener(e -> {
+                if (nodeCheckBox.isSelected()) {
+                    MainWin.selectedNodes.add(new CenterNodeInfo(this.idNumber, this.courseID));
+                } else {
+                    MainWin.selectedNodes
+                            .removeIf(info -> info.equals(new CenterNodeInfo(this.idNumber, this.courseID)));
+                }
+            });
             this.add(nodeCheckBox, BorderLayout.WEST);
         }
         {
@@ -387,10 +428,10 @@ class CenterNode extends JPanel implements Comparable {
             JPanel nodeJLabelsJP = new JPanel();
             nodeJLabelsJP.setLayout(new FlowLayout(FlowLayout.CENTER, 0, -18));
             nodeJLabelsJP.setBackground(new Color(236, 255, 255));
-            sClassJL = new NodeLabel(this.sClass, 200);
+            sClassJL = new NodeLabel(this.className, 200);
             idNumberJL = new NodeLabel(this.idNumber, 150);
             nameJL = new NodeLabel(this.name, 200);
-            courseJL = new NodeLabel(this.course, 450);
+            courseJL = new NodeLabel(this.courseName, 450);
             gradeJL = new NodeLabel(this.grade, 100);
             nodeJLabelsJP.add(sClassJL);
             nodeJLabelsJP.add(idNumberJL);
@@ -410,10 +451,14 @@ class CenterNode extends JPanel implements Comparable {
                 //--------------------ButtonListener--------------------
                 {
                     editButton.addActionListener(e -> {
-
+                        HashSet<CenterNodeInfo> nodeInfo = new HashSet<>();
+                        nodeInfo.add(new CenterNodeInfo(this.idNumber, this.courseID));
+                        new EditWin(null, nodeInfo);
                     });
                     deleteButton.addActionListener(e -> {
-
+                        HashSet<CenterNodeInfo> nodeInfo = new HashSet<>();
+                        nodeInfo.add(new CenterNodeInfo(this.idNumber, this.courseID));
+                        new DeleteWin(null, nodeInfo);
                     });
                 }
 
@@ -452,10 +497,10 @@ class CenterNode extends JPanel implements Comparable {
     @Override
     public String toString() {
         return "CenterNode{" +
-               "sClass='" + sClass + '\'' +
+               "sClass='" + className + '\'' +
                ", idNumber='" + idNumber + '\'' +
                ", name='" + name + '\'' +
-               ", course='" + course + '\'' +
+               ", course='" + courseName + '\'' +
                ", grade=" + grade +
                '}';
     }
@@ -471,6 +516,29 @@ class CenterNode extends JPanel implements Comparable {
     }
 }
 
+class CenterNodeInfo {
+    public String idNumber;
+    public String courseID;
+
+    public CenterNodeInfo(String idNumber, String courseID) {
+        this.idNumber = idNumber;
+        this.courseID = courseID;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CenterNodeInfo that = (CenterNodeInfo) o;
+        return Objects.equals(idNumber, that.idNumber) &&
+               Objects.equals(courseID, that.courseID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idNumber, courseID);
+    }
+}
 
 //----------左侧烂--------------------左侧烂--------------------左侧烂--------------------左侧烂----------
 class LeftPanel extends JPanel {
@@ -593,11 +661,10 @@ class TopPanel extends JPanel {
             leftTopJP.add(addButton);
 
             editButton = new TopButton("批量修改");
+
             leftTopJP.add(editButton);
             delButton = new TopButton("批量删除");
-            delButton.addActionListener(e -> {
 
-            });
             leftTopJP.add(delButton);
             if (MainWin.currentUser instanceof Student) {
                 addButton.setText("添加选课");
@@ -621,9 +688,7 @@ class TopPanel extends JPanel {
             aboutButton = new TopButton("关于");
             logoutButton = new TopButton("退出登录");
             logoutButton.setBorder(new LineBorder(new Color(255, 77, 77)));
-            aboutButton.addActionListener(e -> {
-                new AboutWin(new JFrame());
-            });
+
             rightTopJP.add(arrowLabel);
             rightTopJP.add(aboutButton);
             rightTopJP.add(logoutButton);

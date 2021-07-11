@@ -1,9 +1,7 @@
 package swingUI;
 
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
@@ -37,15 +35,12 @@ public class AboutWin extends JDialog {
             titleLabel.setFont(titleFont);
             jLabel1.setFont(labelFont);
             jLabel2.setFont(labelFont);
+            jLabel2.setBackground(new Color(245, 236, 255));
 
             titleLabel.setBorder(new TitledBorder(
                     new EmptyBorder(0, 0, 0, 0), "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
                     TitledBorder.CENTER, TitledBorder.BOTTOM,
                     new Font("Arial", Font.ITALIC, 10), Color.magenta));
-//            titleLabel.setBorder(new CompoundBorder(new TitledBorder(
-//                    new EmptyBorder(0, 0, 0, 0), "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
-//                    TitledBorder.CENTER, TitledBorder.BOTTOM,
-//                    new Font("Arial", Font.ITALIC, 10), Color.magenta), null));
 
             centerPanel.add(titleLabel);
             centerPanel.add(jLabel1);

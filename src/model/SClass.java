@@ -47,9 +47,6 @@ public class SClass {
 
     @Override
     public String toString() {
-        return "SClass{" +
-                "classID='" + classID + '\'' +
-                ", className='" + className + '\'' +
-                '}';
+        return className;
     }
 }

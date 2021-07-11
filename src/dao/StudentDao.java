@@ -1,5 +1,6 @@
 package dao;
 
+import model.SClass;
 import model.Student;
 
 import java.sql.*;
@@ -139,7 +140,7 @@ public class StudentDao {
         PreparedStatement sta2 = null;
         Connection con = ConnectDao.getConection();
         try {
-            sta1 = con.prepareStatement("DELETE FROM stucougra where idnumber=?");
+            sta1 = con.prepareStatement("DELETE FROM stucougra WHERE idnumber=?");
             sta2 = con.prepareStatement("DELETE FROM students WHERE idnumber=? ");
             for (Student Student : studentList) {
                 sta1.setString(1, Student.getIdNumber());
@@ -166,12 +167,30 @@ public class StudentDao {
         }
     }
 
-    public static void delStudents(int... ids) {
+    public static void delStudents(String... ids) {
         ArrayList<Student> students = new ArrayList<>();
-        for (int id : ids) {
-            students.add(new Student(String.valueOf(id), "", "", ""));
+        for (String id : ids) {
+            students.add(new Student(id, "", "", ""));
         }
         delStudents(students);
+    }
+
+    public static void delStudentClass(String idNumber){
+        PreparedStatement sta = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement("UPDATE students set classID=null where idNumber=?");
+            sta.setString(1, idNumber);
+            sta.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (sta != null) sta.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
     }
 
     public static void updateStudents(ArrayList<Student> studentList) {
@@ -197,7 +216,48 @@ public class StudentDao {
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
-//            ConnectDao.closeConnection();
+        }
+    }
+
+    public static void updateName(String idNumber, String name){
+        PreparedStatement sta = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement(
+                    "UPDATE students set Name=? where idnumber=?"
+            );
+            sta.setString(1, name);
+            sta.setString(2, idNumber);
+            sta.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (sta != null) sta.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+    }
+
+    public static void updateClass(String idNumber, String classID){
+        PreparedStatement sta = null;
+        Connection con = ConnectDao.getConection();
+        try {
+            sta = con.prepareStatement(
+                    "UPDATE students set classID=? where idnumber=?"
+            );
+            sta.setString(1, classID);
+            sta.setString(2, idNumber);
+            sta.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (sta != null) sta.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
     }
 
