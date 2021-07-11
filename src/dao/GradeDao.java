@@ -122,7 +122,7 @@ public class GradeDao {
         }
     }
 
-    public static void delGrade(ArrayList<Grade> gradeList){
+    public static void delEletive(ArrayList<Grade> gradeList){
         PreparedStatement sta = null;
         Connection con = ConnectDao.getConection();
         try {
@@ -143,6 +143,10 @@ public class GradeDao {
             }
 //            ConnectDao.closeConnection();
         }
+    }
+
+    public static void delGrade(){
+
     }
 
     public static void updateGrade(ArrayList<Grade> gradeList) {

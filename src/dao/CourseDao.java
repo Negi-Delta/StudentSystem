@@ -5,6 +5,7 @@ import model.Student;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.SplittableRandom;
 
 /**
  * @author Delta
@@ -47,8 +48,8 @@ public class CourseDao {
         }
     }
 
-    public static String getCourseName(String courseID){
-        String courseName=null;
+    public static String getCourseName(String courseID) {
+        String courseName = null;
         PreparedStatement sta = null;
         ResultSet res = null;
         Connection con = ConnectDao.getConection();
@@ -80,7 +81,7 @@ public class CourseDao {
         }
     }
 
-    public static ArrayList<Integer> containCourse(ArrayList<Course> courseList){
+    public static ArrayList<Integer> containCourses(ArrayList<Course> courseList) {
         ArrayList<Integer> res = new ArrayList<>();
         int index = -1;
         ArrayList<Course> curCourse = CourseDao.getCourseList();
@@ -90,6 +91,22 @@ public class CourseDao {
                 res.add(index);
                 break;
             }
+        }
+        return res;
+    }
+
+    public static ArrayList<Integer> containCourses(String... ids) {
+        ArrayList<Course> res = new ArrayList<>();
+        for (String id : ids) {
+            res.add(new Course(id, ""));
+        }
+        return containCourses(res);
+    }
+
+    public static boolean containCourse(String courseID) {
+        boolean res = false;
+        if (containCourses(courseID).size() > 0) {
+            res = true;
         }
         return res;
     }
@@ -117,7 +134,7 @@ public class CourseDao {
         }
     }
 
-    public static void delCourse(ArrayList<Course> courseList){
+    public static void delCourse(ArrayList<Course> courseList) {
         PreparedStatement sta1 = null;
         PreparedStatement sta2 = null;
         Connection con = ConnectDao.getConection();
@@ -149,7 +166,7 @@ public class CourseDao {
         }
     }
 
-    public static void delCourse(int... ids){
+    public static void delCourse(int... ids) {
         ArrayList<Course> courses = new ArrayList<>();
         for (int id : ids) {
             courses.add(new Course(String.valueOf(id), ""));

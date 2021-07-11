@@ -12,9 +12,11 @@ public class Student extends Users{
         this.classID = classID;
     }
 
-    public Student(String idNumber, String password) {
-        super(idNumber, password, null);
+    public Student(String idNumber, String name) {
+        super(idNumber, null, name);
     }
+
+
 
     public String getClassID() {
         return classID;

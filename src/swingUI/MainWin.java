@@ -1,5 +1,7 @@
 package swingUI;
 
+import JFormDesigner.ADDWIN;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import dao.ClassDao;
 import dao.CourseDao;
 import dao.GradeDao;
@@ -19,7 +21,6 @@ import java.util.*;
  * @author Delta
  * Created in 2021-07-04 18:14
  */
-/*------------------------------------MainWindows------------------------------------*/
 public class MainWin extends JFrame {
     public static Users currentUser;
 
@@ -53,10 +54,13 @@ public class MainWin extends JFrame {
                 int mouseYInMainWin = MouseInfo.getPointerInfo().getLocation().y - MainWin.this.getBounds().y;
             */
             topPanel.rightTopJP.setBounds(this.getBounds().width - 37, 0, 180, 37);
-            /*--------------------Timer----------------------------------------Timer--------------------*/
+            //--------------------Timer----------------------------------------Timer--------------------
             JButton stopShow = new JButton();
             Timer timerShow = new Timer(15, e -> {
-                topPanel.rightTopJP.setBounds(Math.max(topPanel.rightTopJP.getBounds().x - 5, MainWin.this.getBounds().width - 37 - 160), 0, 180, 37);
+                topPanel.rightTopJP.setBounds(
+                        Math.max(topPanel.rightTopJP.getBounds().x - 5, MainWin.this.getBounds().width - 37 - 160), 0,
+                        180, 37
+                );
                 if (topPanel.rightTopJP.getBounds().x < MainWin.this.getBounds().width - 37 - 110)
                     topPanel.arrowLabel.setText("►");
                 topPanel.rightTopJP.repaint();
@@ -71,7 +75,10 @@ public class MainWin extends JFrame {
             });
             JButton stopHide = new JButton();
             Timer timerHide = new Timer(15, e -> {
-                topPanel.rightTopJP.setBounds(Math.min(topPanel.rightTopJP.getBounds().x + 1, MainWin.this.getBounds().width - 37), 0, 180, 37);
+                topPanel.rightTopJP
+                        .setBounds(Math.min(topPanel.rightTopJP.getBounds().x + 1, MainWin.this.getBounds().width - 37),
+                                   0, 180, 37
+                        );
                 if (topPanel.rightTopJP.getBounds().x > MainWin.this.getBounds().width - 37 - 70)
                     topPanel.arrowLabel.setText("◄");
                 topPanel.rightTopJP.repaint();
@@ -84,7 +91,7 @@ public class MainWin extends JFrame {
                     timerHide.stop();
                 }
             });
-            /*--------------------MouseListener----------------------------------------MouseListener--------------------*/
+            //--------------------MouseListener----------------------------------------MouseListener--------------------
             topPanel.addMouseListener(new MouseListener() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
@@ -96,7 +103,8 @@ public class MainWin extends JFrame {
                 public void mouseExited(MouseEvent e) {
                     int mouseXInMainWin = MouseInfo.getPointerInfo().getLocation().x - MainWin.this.getBounds().x;
                     int mouseYInMainWin = MouseInfo.getPointerInfo().getLocation().y - MainWin.this.getBounds().y;
-                    if (mouseXInMainWin > MainWin.this.getBounds().width - 10 || mouseXInMainWin < 10 || mouseYInMainWin < 35 || mouseYInMainWin > 62) {
+                    if (mouseXInMainWin > MainWin.this.getBounds().width - 10 || mouseXInMainWin < 10 ||
+                        mouseYInMainWin < 35 || mouseYInMainWin > 62) {
                         timerShow.stop();
                         timerHide.start();
                     }
@@ -113,12 +121,18 @@ public class MainWin extends JFrame {
             });
 
             topPanel.logoutButton.addActionListener(e -> {
-                this.dispose();
-                parentLoginFrame.setVisible(true);
+                int ans = JOptionPane.showConfirmDialog(new JFrame(), "退出登录？", "", JOptionPane.YES_NO_OPTION,
+                                                        JOptionPane.WARNING_MESSAGE
+                );
+                if (ans == JOptionPane.YES_OPTION) {
+                    this.dispose();
+                    parentLoginFrame.setVisible(true);
+                }
             });
 
             topPanel.addButton.addActionListener(e -> {
-                new AddItemWin(this);
+                if (currentUser instanceof Teacher) new AddItemWin(this);
+                else new AddEletiveWin();
             });
         }
         mainjp.add(topPanel, BorderLayout.NORTH);
@@ -130,44 +144,67 @@ public class MainWin extends JFrame {
         {
             //添加筛选班级和课程
             {
-                ArrayList<SClass> classList = ClassDao.getClassList();
-                for (SClass sClass : classList) {
-                    leftPanel.classJComboBox.addItem(sClass.getClassName());
-                }
-                ArrayList<Course> courseList = CourseDao.getCourseList();
-                for (Course course : courseList) {
-                    leftPanel.courseJComboBox.addItem(course.getCourseName());
-                }
                 //筛选监听器
                 leftPanel.classJComboBox.addActionListener(e -> {
                     String classFilter = (String) leftPanel.classJComboBox.getSelectedItem();
                     ArrayList<CenterNode> centerNodes = centerPanel.getAllCenterNodes();
-                    if(!classFilter.equals("NULL"))centerNodes.removeIf(centerNode -> !centerNode.sClass.equals(classFilter));
+                    if (!classFilter.equals("NULL"))
+                        centerNodes.removeIf(centerNode -> !classFilter.equals(centerNode.sClass));
                     centerPanel.setCenterBox(centerNodes, leftPanel.getSortStandard());
                 });
                 leftPanel.courseJComboBox.addActionListener(e -> {
                     String courseFilter = (String) leftPanel.courseJComboBox.getSelectedItem();
                     ArrayList<CenterNode> centerNodes = centerPanel.getAllCenterNodes();
-                    if(!courseFilter.equals("NULL"))centerNodes.removeIf(centerNode -> !centerNode.course.equals(courseFilter));
+                    if (!courseFilter.equals("NULL"))
+                        centerNodes.removeIf(centerNode -> !courseFilter.equals(centerNode.course));
                     centerPanel.setCenterBox(centerNodes, leftPanel.getSortStandard());
                 });
             }
             //排序
             {
-                leftPanel.idUp.addActionListener(e->{
+                leftPanel.idUp.addActionListener(e -> {
                     centerPanel.setCenterBox(centerPanel.centerNodes, "idUp");
                 });
-                leftPanel.idDown.addActionListener(e->{
+                leftPanel.idDown.addActionListener(e -> {
                     centerPanel.setCenterBox(centerPanel.centerNodes, "idDown");
                 });
-                leftPanel.gradeUp.addActionListener(e->{
+                leftPanel.gradeUp.addActionListener(e -> {
                     centerPanel.setCenterBox(centerPanel.centerNodes, "gradeUp");
                 });
-                leftPanel.gradeDown.addActionListener(e->{
+                leftPanel.gradeDown.addActionListener(e -> {
                     centerPanel.setCenterBox(centerPanel.centerNodes, "gradeDown");
                 });
             }
-
+            //刷新
+            {
+                leftPanel.freshButton.addActionListener(e -> {
+                    ArrayList<CenterNode> centerNodes = centerPanel.getAllCenterNodes();
+                    centerPanel.setCenterBox(centerNodes, "idUp");
+                    if (MainWin.currentUser instanceof Teacher) {
+                        leftPanel.setFilter();
+                        leftPanel.setVisible(false);
+                        leftPanel.setVisible(true);
+                        {
+                            //筛选监听器
+                            leftPanel.classJComboBox.addActionListener(d -> {
+                                String classFilter = (String) leftPanel.classJComboBox.getSelectedItem();
+                                ArrayList<CenterNode> centerNodes2 = centerPanel.getAllCenterNodes();
+                                if (!classFilter.equals("NULL"))
+                                    centerNodes2.removeIf(centerNode -> !classFilter.equals(centerNode.sClass));
+                                centerPanel.setCenterBox(centerNodes2, leftPanel.getSortStandard());
+                            });
+                            leftPanel.courseJComboBox.addActionListener(d -> {
+                                String courseFilter = (String) leftPanel.courseJComboBox.getSelectedItem();
+                                ArrayList<CenterNode> centerNodes2 = centerPanel.getAllCenterNodes();
+                                if (!courseFilter.equals("NULL"))
+                                    centerNodes2.removeIf(centerNode -> !courseFilter.equals(centerNode.course));
+                                centerPanel.setCenterBox(centerNodes2, leftPanel.getSortStandard());
+                            });
+                        }
+                    }
+                    System.out.println("fresh");
+                });
+            }
         }
         mainjp.add(leftPanel, BorderLayout.WEST);
 
@@ -197,22 +234,8 @@ public class MainWin extends JFrame {
 
             }
         });
-        if (MainWin.currentUser instanceof Student) {
-            studentMod();
-        } else {
-            teacherMod();
-        }
+
         this.add(mainjp);
-    }
-
-    private void studentMod() {
-        topPanel.leftTopJP.setVisible(false);
-        leftPanel.setVisible(false);
-    }
-
-    private void teacherMod() {
-        topPanel.leftTopJP.setVisible(true);
-        leftPanel.setVisible(true);
     }
 
     public static void main(String[] args) {
@@ -220,7 +243,7 @@ public class MainWin extends JFrame {
     }
 }
 
-/*----------中央栏--------------------中央栏--------------------中央栏--------------------中央栏----------*/
+//----------中央栏--------------------中央栏--------------------中央栏--------------------中央栏----------
 class CenterPanel extends JPanel {
     JScrollPane centerJSP;
     JPanel centerBox = new JPanel();
@@ -238,7 +261,7 @@ class CenterPanel extends JPanel {
         this.add(centerJSP);
     }
 
-    public ArrayList<CenterNode> getAllCenterNodes(){
+    public ArrayList<CenterNode> getAllCenterNodes() {
         centerNodes = new ArrayList<>();
         ArrayList<Student> students;
         if (MainWin.currentUser instanceof Student) {
@@ -287,8 +310,12 @@ class CenterPanel extends JPanel {
                 Collections.sort(centerNodes, new Comparator<CenterNode>() {
                     @Override
                     public int compare(CenterNode o1, CenterNode o2) {
-                        Integer i1 = Integer.parseInt(o1.grade);
-                        Integer i2 = Integer.parseInt(o2.grade);
+                        Integer i1, i2;
+                        if (o1.grade == null) i1 = 0;
+                        else i1 = Integer.parseInt(o1.grade);
+                        if (o2.grade == null) i2 = 0;
+                        else i2 = Integer.parseInt(o2.grade);
+
                         return i1.compareTo(i2);
                     }
                 });
@@ -297,8 +324,12 @@ class CenterPanel extends JPanel {
                 Collections.sort(centerNodes, new Comparator<CenterNode>() {
                     @Override
                     public int compare(CenterNode o1, CenterNode o2) {
-                        Integer i1 = Integer.parseInt(o1.grade);
-                        Integer i2 = Integer.parseInt(o2.grade);
+                        Integer i1, i2;
+                        if (o1.grade == null) i1 = 0;
+                        else i1 = Integer.parseInt(o1.grade);
+                        if (o2.grade == null) i2 = 0;
+                        else i2 = Integer.parseInt(o2.grade);
+
                         return -i1.compareTo(i2);
                     }
                 });
@@ -309,7 +340,6 @@ class CenterPanel extends JPanel {
         //添加数据组件
         Iterator<CenterNode> listIterator = centerNodes.iterator();
         while (listIterator.hasNext()) {
-            System.out.println("setCenterBox:");
             centerBox.add(listIterator.next());
         }
 
@@ -318,7 +348,7 @@ class CenterPanel extends JPanel {
     }
 }
 
-/*--------------------CenterNode--------------------*/
+//--------------------CenterNode--------------------
 class CenterNode extends JPanel implements Comparable {
     String sClass;
     String idNumber;
@@ -353,9 +383,9 @@ class CenterNode extends JPanel implements Comparable {
             this.add(nodeCheckBox, BorderLayout.WEST);
         }
         {
-            /*--------------------nodeJLabelsJP--------------------*/
+            //--------------------nodeJLabelsJP--------------------
             JPanel nodeJLabelsJP = new JPanel();
-            nodeJLabelsJP.setLayout(new FlowLayout(FlowLayout.CENTER, 0, -1));
+            nodeJLabelsJP.setLayout(new FlowLayout(FlowLayout.CENTER, 0, -18));
             nodeJLabelsJP.setBackground(new Color(236, 255, 255));
             sClassJL = new NodeLabel(this.sClass, 200);
             idNumberJL = new NodeLabel(this.idNumber, 150);
@@ -371,12 +401,22 @@ class CenterNode extends JPanel implements Comparable {
         }
         if (MainWin.currentUser instanceof Teacher) {
             {
-                /*--------------------nodeButtonsJP--------------------*/
+                //--------------------nodeButtonsJP--------------------
                 JPanel nodeButtonsJP = new JPanel();
                 nodeButtonsJP.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
                 nodeButtonsJP.setBackground(new Color(236, 255, 255));
                 editButton = new NodeButton("编辑", 90);
                 deleteButton = new NodeButton("删除", 90);
+                //--------------------ButtonListener--------------------
+                {
+                    editButton.addActionListener(e -> {
+
+                    });
+                    deleteButton.addActionListener(e -> {
+//                        GradeDao.updateGrade();
+                    });
+                }
+
                 nodeButtonsJP.add(editButton);
                 nodeButtonsJP.add(deleteButton);
                 this.add(nodeButtonsJP, BorderLayout.EAST);
@@ -388,17 +428,17 @@ class CenterNode extends JPanel implements Comparable {
         this.setBackground(Color.pink);
     }
 
-    /*--------------------NodeLabel--------------------*/
+    //--------------------NodeLabel--------------------
     class NodeLabel extends JLabel {
         public NodeLabel(String text, int width) {
             super(text);
             setFont(new Font("等线", Font.PLAIN, 25));
-            setPreferredSize(new Dimension(width, 40));
+            setPreferredSize(new Dimension(width, 80));
             setBorder(new LineBorder(new Color(0, 150, 150)));
         }
     }
 
-    /*--------------------NodeButton--------------------*/
+    //--------------------NodeButton--------------------
     class NodeButton extends JButton {
         public NodeButton(String text, int width) {
             super(text);
@@ -412,12 +452,12 @@ class CenterNode extends JPanel implements Comparable {
     @Override
     public String toString() {
         return "CenterNode{" +
-                "sClass='" + sClass + '\'' +
-                ", idNumber='" + idNumber + '\'' +
-                ", name='" + name + '\'' +
-                ", course='" + course + '\'' +
-                ", grade=" + grade +
-                '}';
+               "sClass='" + sClass + '\'' +
+               ", idNumber='" + idNumber + '\'' +
+               ", name='" + name + '\'' +
+               ", course='" + course + '\'' +
+               ", grade=" + grade +
+               '}';
     }
 
     @Override
@@ -432,7 +472,7 @@ class CenterNode extends JPanel implements Comparable {
 }
 
 
-/*----------左侧烂--------------------左侧烂--------------------左侧烂--------------------左侧烂----------*/
+//----------左侧烂--------------------左侧烂--------------------左侧烂--------------------左侧烂----------
 class LeftPanel extends JPanel {
     JTabbedPane filter;
     JComboBox<String> classJComboBox;
@@ -442,45 +482,31 @@ class LeftPanel extends JPanel {
     JRadioButton idDown;
     JRadioButton gradeUp;
     JRadioButton gradeDown;
+    JButton freshButton;
 
     public LeftPanel() {
         this.setBackground(new Color(244, 255, 235));
         this.setPreferredSize(new Dimension(230, 2));
         this.setLayout(new FlowLayout());
 
-        /*--------------------filter--------------------*/
-        filter = new JTabbedPane();//筛选
-        {
-            //----------classJComboBox
-            classJComboBox = new JComboBox<>();
-            classJComboBox.addItem("NULL");
-            filter.addTab("班级", classJComboBox);
-        }
-        {
-            //----------courseJComboBox
-            courseJComboBox = new JComboBox<>();
-            courseJComboBox.addItem("NULL");
-            filter.addTab("课程", courseJComboBox);
-        }
-        filter.setPreferredSize(new Dimension(200, 80));
-        filter.setBorder(new TitledBorder("筛选"));
-        this.add(filter);
+        //--------------------freshButton--------------------
+        freshButton = new JButton("刷新重置");
+        this.add(freshButton);
 
-        /*--------------------sort--------------------*/
+
+        //--------------------sort--------------------
         sort = new JTabbedPane();//排序
         ButtonGroup sortButtonGroup = new ButtonGroup();
-        {
-            //----------|--idJRadioButtonDown
-            idUp = new JRadioButton("按Id升序排列");
-            idDown = new JRadioButton("按Id降序排列");
-            //----------|--idButtonGroup
-            sortButtonGroup.add(idUp);
-            sortButtonGroup.add(idDown);
-            JPanel idButtonPanel = new JPanel();
-            idButtonPanel.add(idUp);
-            idButtonPanel.add(idDown);
-            sort.addTab("ID", idButtonPanel);
-        }
+        //----------|--idJRadioButtonDown
+        idUp = new JRadioButton("按Id升序排列");
+        idDown = new JRadioButton("按Id降序排列");
+        //----------|--idButtonGroup
+        sortButtonGroup.add(idUp);
+        sortButtonGroup.add(idDown);
+        JPanel idButtonPanel = new JPanel();
+        idButtonPanel.add(idUp);
+        idButtonPanel.add(idDown);
+        if (MainWin.currentUser instanceof Teacher) sort.addTab("ID", idButtonPanel);
         {
             //----------|--CourseJRadioButtonDown
             gradeUp = new JRadioButton("按成绩升序排列");
@@ -497,20 +523,53 @@ class LeftPanel extends JPanel {
         sort.setPreferredSize(new Dimension(200, 120));
         sort.setBorder(new TitledBorder("排序"));
         this.add(sort);
+
+        //--------------------filter--------------------
+        setFilter();
     }
 
-    public String getSortStandard(){
-        if(idUp.isSelected()) return "idUp";
-        if(idDown.isSelected()) return "idDown";
-        if(gradeUp.isSelected()) return "gradeUp";
-        if(gradeDown.isSelected()) return "gradeDown";
+    public void setFilter() {
+        if (filter != null) this.remove(filter);
+            filter = new JTabbedPane();//筛选
+            //----------classJComboBox
+            classJComboBox = new JComboBox<>();
+            classJComboBox.addItem("NULL");
+            filter.addTab("班级", classJComboBox);
+            if (MainWin.currentUser instanceof Student) {
+                filter.setVisible(false);
+            }
+            ArrayList<SClass> classList = ClassDao.getClassList();
+            for (SClass sClass : classList) {
+                classJComboBox.addItem(sClass.getClassName());
+            }
+            //----------courseJComboBox
+            courseJComboBox = new JComboBox<>();
+            courseJComboBox.addItem("NULL");
+            filter.addTab("课程", courseJComboBox);
+            ArrayList<Course> courseList = CourseDao.getCourseList();
+            for (Course course : courseList) {
+                courseJComboBox.addItem(course.getCourseName());
+            }
+
+            filter.setPreferredSize(new Dimension(200, 80));
+            filter.setBorder(new TitledBorder("筛选"));
+            this.add(filter);
+//        filter.repaint();
+    }
+
+    public String getSortStandard() {
+        if (idUp.isSelected()) return "idUp";
+        if (idDown.isSelected()) return "idDown";
+        if (gradeUp.isSelected()) return "gradeUp";
+        if (gradeDown.isSelected()) return "gradeDown";
         throw new RuntimeException("未选中排序");
     }
 }
 
-/*----------顶部栏--------------------顶部栏--------------------顶部栏--------------------顶部栏----------*/
+//----------顶部栏--------------------顶部栏--------------------顶部栏--------------------顶部栏----------
 class TopPanel extends JPanel {
     TopButton addButton;
+    TopButton editButton;
     TopButton delButton;
     TopButton aboutButton;
     TopButton logoutButton;
@@ -525,22 +584,32 @@ class TopPanel extends JPanel {
         this.setLayout(null);
         this.setPreferredSize(new Dimension(1570, 37));
 
-        /*--------------------leftTopJP--------------------*/
+        //--------------------leftTopJP--------------------
         leftTopJP = new JPanel(new FlowLayout(FlowLayout.LEFT));
         leftTopJP.setBounds(0, 0, 500, 37);
         {
             leftTopJP.setOpaque(false);
-            addButton = new TopButton("添加");
-            delButton = new TopButton("删除选中");
+            addButton = new TopButton("批量添加");
+            leftTopJP.add(addButton);
+
+            editButton = new TopButton("批量修改");
+            leftTopJP.add(editButton);
+            delButton = new TopButton("批量删除");
             delButton.addActionListener(e -> {
 
             });
-            leftTopJP.add(addButton);
             leftTopJP.add(delButton);
+            if (MainWin.currentUser instanceof Student) {
+                addButton.setText("添加选课");
+
+                editButton.setVisible(false);
+                delButton.setVisible(false);
+            }
+
         }
         this.add(leftTopJP);
 
-        /*--------------------rightTopJP--------------------*/
+        //--------------------rightTopJP--------------------
         rightTopJP = new JPanel();
 //        rightTopJP.setBounds(1550, 0, 180, 37);
         rightTopJP.setBorder(new LineBorder(new Color(255, 179, 254)));
@@ -552,6 +621,9 @@ class TopPanel extends JPanel {
             aboutButton = new TopButton("关于");
             logoutButton = new TopButton("退出登录");
             logoutButton.setBorder(new LineBorder(new Color(255, 77, 77)));
+            aboutButton.addActionListener(e -> {
+                new AboutWin(new JFrame());
+            });
             rightTopJP.add(arrowLabel);
             rightTopJP.add(aboutButton);
             rightTopJP.add(logoutButton);

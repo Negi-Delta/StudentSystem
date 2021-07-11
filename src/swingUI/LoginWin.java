@@ -129,6 +129,7 @@ public class LoginWin extends JFrame {
                         if (loginStudent.getPassword().equals(password)) {
                             //密码正确
                             JOptionPane.showMessageDialog(LoginWin.this, "登录成功！", "", JOptionPane.INFORMATION_MESSAGE);
+                            loginPanel.clear();
                             LoginWin.this.dispose();
                             MainWin.currentUser = loginStudent;
                             new MainWin(this);
@@ -154,6 +155,7 @@ public class LoginWin extends JFrame {
                         if (loginteacher.getPassword().equals(password)) {
                             //密码正确
                             JOptionPane.showMessageDialog(LoginWin.this, "登录成功！", "", JOptionPane.INFORMATION_MESSAGE);
+                            loginPanel.clear();
                             LoginWin.this.dispose();
                             MainWin.currentUser = loginteacher;
                             new MainWin(this);
