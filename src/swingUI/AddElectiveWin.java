@@ -58,7 +58,9 @@ public class AddElectiveWin extends JDialog {
 //            addButton = new TopButton("添加");
             addButton.addActionListener(e->{
                 String addCourse = ((Course)courseJComboBox.getSelectedItem()).getCourseID();
-                GradeDao.addGrade(MainWin.currentUser.getIdNumber(), addCourse);
+                GradeDao.addElective(MainWin.currentUser.getIdNumber(), addCourse);
+                JOptionPane.showMessageDialog(this, "添加成功!");
+                this.dispose();
             });
             jPanel.add(addButton);
         }

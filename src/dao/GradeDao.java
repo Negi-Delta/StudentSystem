@@ -1,8 +1,6 @@
 package dao;
 
-import model.Course;
 import model.Grade;
-import model.Student;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -99,7 +97,7 @@ public class GradeDao {
         return res;
     }
 
-    public static void addGrade(ArrayList<Grade> gradeList) {
+    public static void addGrades(ArrayList<Grade> gradeList) {
         PreparedStatement sta = null;
         Connection con = ConnectDao.getConection();
         try {
@@ -123,11 +121,11 @@ public class GradeDao {
         }
     }
 
-    public static void addGrade(String idNumber, String course) {
+    public static void addElective(String idNumber, String course) {
         ArrayList<Grade> gradeList = new ArrayList<>();
         System.out.println(course);
         gradeList.add(new Grade(idNumber, course, null));
-        addGrade(gradeList);
+        addGrades(gradeList);
     }
 
     public static void delElective(ArrayList<Grade> gradeList){

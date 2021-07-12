@@ -5,6 +5,7 @@ import dao.CourseDao;
 import dao.GradeDao;
 import dao.StudentDao;
 import model.Course;
+import model.Grade;
 import model.SClass;
 
 import javax.swing.*;
@@ -71,14 +72,19 @@ public class EditWin extends JDialog {
             }
         }
         {
-            ArrayList<Course> courseList = CourseDao.getCourseList();
+            String idNumber = null;
+            for (CenterNodeInfo id : NodesID) {
+                idNumber = id.idNumber;
+            }
+            ArrayList<Grade> courseList = GradeDao.getStudentGrade(idNumber);
             if (courseList.size() > 0) {
-                for (Course course : courseList) {
-                    electiveComboBox.addItem(course);
+                for (Grade grade : courseList) {
+                    electiveComboBox.addItem(new Course(null, CourseDao.getCourseName(grade.getCourseID())));
                 }
             } else {
                 electiveComboBox.addItem(new Course(null, "NULL"));
                 editElective.setEnabled(false);
+                editGrade.setEnabled(false);
             }
         }
 
@@ -146,52 +152,38 @@ public class EditWin extends JDialog {
             editButton.setFont(new Font("等线", Font.BOLD, 20));
             editButton.setForeground(Color.black);
             editButton.addActionListener(e -> {
-                if (size<1) return;
+                if (size < 1) return;
                 if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this, "确认提交?", "",
                                                                             JOptionPane.YES_NO_OPTION
                 )) {
+                    if (editName.isSelected() && !nameTextField.getText().matches("[\\w[\\u4E00-\\u9FA5]]{1,10}")) {
+                        JOptionPane.showMessageDialog(this,
+                                                      "存在格式错误\n可能的错误：姓名长度应在两位至十位", "ERROR", JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
+                    if (editGrade.isSelected() && !gradeTextField.getText().matches("\\d{1,3}")) {
+                        JOptionPane.showMessageDialog(this,
+                                                      "存在格式错误\n可能的错误：成绩值应为小于1000的整数", "ERROR", JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
                     for (CenterNodeInfo id : NodesID) {
-                        if (editName.isSelected())
-                            if (nameTextField.getText().matches("[\\w[\\u4E00-\\u9FA5]]{1,10}")) {
-                                StudentDao.updateName(id.idNumber, editName.getText());
-                            } else {
-                                JOptionPane.showMessageDialog(this,
-                                                              "存在格式错误\n可能的错误：姓名长度应在两位至十位", "ERROR",
-                                                              JOptionPane.ERROR_MESSAGE
-                                );
-                                return;
-                            }
+                        if (editName.isSelected()) {
+                            StudentDao.updateName(id.idNumber, editName.getText());
+                        }
                         if (editClass.isSelected()) {
-                            StudentDao.updateClass(id.idNumber,
-                                                   ((SClass) classComboBox.getSelectedItem()).getClassID()
-                            );
+                            StudentDao
+                                    .updateClass(id.idNumber, ((SClass) classComboBox.getSelectedItem()).getClassID());
                         }
                         if (editElective.isSelected()) {
-                            if (Integer.parseInt(gradeTextField.getText()) < 1000) {
-                                GradeDao.updateGrade(id.idNumber,
-                                                     ((Course) electiveComboBox.getSelectedItem()).getCourseID(),
-                                                     gradeTextField.getText()
-                                );
-                            } else {
-                                JOptionPane.showMessageDialog(this,
-                                                              "存在格式错误\n可能的错误：成绩值应为小于1000的整数", "ERROR",
-                                                              JOptionPane.ERROR_MESSAGE
-                                );
-                            }
+                            GradeDao.updateGrade(id.idNumber,
+                                                 ((Course) electiveComboBox.getSelectedItem()).getCourseID(),
+                                                 gradeTextField.getText()
+                            );
                         } else {
                             if (editGrade.isSelected()) {
-                                if (gradeTextField.getText().matches("\\d{1,3}")) {
-                                    GradeDao.updateGrade(id.idNumber,
-                                                         id.courseID,
-                                                         gradeTextField.getText()
-                                    );
-                                } else {
-                                    JOptionPane.showMessageDialog(this,
-                                                                  "存在格式错误\n可能的错误：成绩值应为小于1000的整数", "ERROR",
-                                                                  JOptionPane.ERROR_MESSAGE
-                                    );
-                                    return;
-                                }
+                                GradeDao.updateGrade(id.idNumber, id.courseID, gradeTextField.getText());
                             }
                         }
                     }
@@ -200,12 +192,18 @@ public class EditWin extends JDialog {
                 }
             });
         }
+
         transparentPanel jPanel1 = new transparentPanel();
-        jPanel1.setLayout(new FlowLayout(FlowLayout.CENTER));
+        jPanel1.setLayout(new
+
+                                  FlowLayout(FlowLayout.CENTER));
         jPanel1.add(editButton);
         jPanel.add(jPanel1, BorderLayout.SOUTH);
 
-        this.add(jPanel);
+        this.
+
+                    add(jPanel);
+
     }
 
     public static void main(String[] args) {
